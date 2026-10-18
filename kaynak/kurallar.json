@@ -1,12 +1,13 @@
 {
- "_aciklama": "Pratik saat/yer kuralları. Kaynak: 4A pratik grubu duyuruları (23 Eyl - 15 Eki 2026) ve üst dönem notu. Sıra kuralı: grup her yapılan pratikte sıra değiştirir (bir önceki pratikte ilk giren bu sefer ikinci girer). Temsilci düzeltmesi her zaman önce gelir.",
+ "_aciklama": "Pratik saat/yer kuralları. Genel kural (varsayilan): grup her yapılan pratikte sıra değiştirir; ilk pratikte a önce girer (13:30), b sonra (14:30). Derse özel kayıt bunu ezer. Kaynak: 4A pratik grubu duyuruları (23 Eyl - 15 Eki 2026) ve üst dönem notu. Temsilci düzeltmesi ve bölüm listesi her zaman önce gelir.",
  "dersler": {
   "Biyoistatistik": {
    "bas": "13:30",
    "sure": 45,
    "yer": "TBA amfisi (Amfiler binası)",
    "onluk": "Önlük gerekmez",
-   "not": "Bütün grup birlikte girer"
+   "not": "Bütün grup birlikte girer",
+   "sira": "yok"
   },
   "Biyokimya": {
    "sira": "ab_donusumlu",
@@ -40,5 +41,14 @@
    "yer": "Temel Bilimler B Blok 2. kat",
    "onluk": "Önlük gerekli"
   }
+ },
+ "varsayilan": {
+  "sira": "ab_donusumlu",
+  "ilk": "a",
+  "saatler": [
+   "13:30",
+   "14:30"
+  ],
+  "sure": 60
  }
 }

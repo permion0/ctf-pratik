@@ -17,7 +17,7 @@ const AY_ADI = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz'
 const PROGRAM_AD = { TR: 'Türkçe Tıp', MT: 'Türkçe Tıp', EN: 'İngilizce Tıp' };
 
 /* Pratik yerleri: okulun öğrenci portalındaki "1001 Pratikleri" bilgisi */
-const kural = ders => (VERI.kurallar || {})[ders] || {};
+const kural = ders => ({ ...(VERI.kural_varsayilan || {}), ...((VERI.kurallar || {})[ders] || {}) });
 const saatEkle = (s, n) => { const t = dk(s) + n; return String(t / 60 | 0).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0'); };
 
 function hat(ad) {
@@ -114,7 +114,7 @@ function pratikler(gun) {
     if (p.bas) continue;
     const k = kural(p.ders);
     if ((k.iptal || []).includes(gun)) { p.iptal = true; continue; }
-    if (k.sira === 'ab_donusumlu' && p.kurul) {
+    if (k.sira === 'ab_donusumlu' && p.kurul && /^\d$/.test(p.deger || '')) {
       const sira = yapilanlar(p.ders, p.kurul, (p.grup || durum.grup)[0]).indexOf(gun);
       if (sira >= 0) {
         const g = p.grup || durum.grup;
@@ -124,7 +124,7 @@ function pratikler(gun) {
         p.tahmini = true;
         p.siraNotu = once === 'birlikte' ? 'İki grup birlikte girer' : `Bu sefer önce ${g[0]}${once} girer`;
       }
-    } else if (k.bas) { p.bas = k.bas; p.bit = saatEkle(k.bas, k.sure || 60); p.tahmini = true; }
+    } else if (k.bas || k.saatler) { p.bas = k.bas || k.saatler[0]; p.bit = saatEkle(p.bas, k.sure || 60); p.tahmini = true; }
   }
   // temsilci düzeltmeleri
   for (const d of VERI.duzeltmeler || []) {

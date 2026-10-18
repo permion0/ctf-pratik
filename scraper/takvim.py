@@ -3,7 +3,7 @@
 - data/takvim/<program>-<grup>.ics : teorik dersler + grubun pratik günleri + sınavlar
 - data/takvim/k/<numara özeti>.ics  : yukarıdakine ek olarak bölüm listesindeki kesin pratik saatleri
 """
-import hashlib, os
+import hashlib, os, re
 
 PRATIK_YER = {'Anatomi': 'Temel Bilimler B Blok, 2. kat', 'Biyofizik': 'Temel Bilimler B Blok, 2. kat',
               'Biyokimya': 'Temel Bilimler B Blok, 1. kat', 'Biyoistatistik': 'Dahiliye binası, Hakkı Ogan amfisi'}
@@ -45,10 +45,12 @@ def _ekle(s, n):
 
 def kural_saati(veri, ders, kurul, grup, tarih):
     """Sitedeki siraKimde/yapilanlar ile aynı mantık. (bas, bit, not) ya da None."""
-    k = (veri.get('kurallar') or {}).get(ders) or {}
+    k = {**(veri.get('kural_varsayilan') or {}), **((veri.get('kurallar') or {}).get(ders) or {})}
     if tarih in k.get('iptal', []):
         return 'iptal'
-    if k.get('sira') == 'ab_donusumlu':
+    deger = next((g['degerler'].get(ders) for kk in (veri.get('pratik') or {}).get('kurullar', []) if kk['kurul'] == kurul
+                  for g in kk['gunler'] if g['tarih'] == tarih), '') or ''
+    if k.get('sira') == 'ab_donusumlu' and re.fullmatch(r'\d', deger):
         yap = []
         for kk in (veri.get('pratik') or {}).get('kurullar', []):
             if kk['kurul'] != kurul:
@@ -67,8 +69,9 @@ def kural_saati(veri, ders, kurul, grup, tarih):
             ilk = k.get('ilk', 'a'); once = ilk if i % 2 == 0 else ('b' if ilk == 'a' else 'a')
         bas = k['saatler'][0] if once == 'birlikte' or grup[1:] == once else k['saatler'][1]
         return bas, _ekle(bas, k.get('sure', 60)), ('İki grup birlikte girer' if once == 'birlikte' else f'Bu sefer önce {grup[0]}{once} girer') + ' (tahmini)'
-    if k.get('bas'):
-        return k['bas'], _ekle(k['bas'], k.get('sure', 60)), 'Tahmini saat'
+    if k.get('bas') or k.get('saatler'):
+        bas = k.get('bas') or k['saatler'][0]
+        return bas, _ekle(bas, k.get('sure', 60)), 'Tahmini saat'
     return None
 
 
