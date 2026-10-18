@@ -281,22 +281,22 @@ function gorPratik() {
   for (const kurul of kurullar.sort((a, b) => (a === aktif ? -1 : b === aktif ? 1 : a.localeCompare(b)))) {
     const satirlar = Object.entries(gruplu).filter(([a]) => a.startsWith(kurul + '|'));
     const kurulToplam = satirlar.reduce((t, [, l]) => t + l.filter(p => !p.iptal).length, 0);
-    const kurulHak = kurulToplam < 2 ? 0 : kurulToplam < 10 ? 1 : Math.floor(kurulToplam / 5);
+    const kurulHak = kurulToplam < 2 ? 0 : kurulToplam < 10 ? 1 : 2;  // 9'a kadar 1, 10-14 → 2; kurulda en fazla 2
     const kurulKullanilan = satirlar.reduce((t, [, l]) => t + l.filter(p => !p.iptal && durum.gitmedim[`${p.tarih}|${p.ders}`]).length, 0);
-    h += `<section class="bolum"><h2>${esc(kurul)} kurulu</h2><p>${kurulToplam} pratik, kurulda toplam ${kurulHak} devamsızlık hakkı${kurulKullanilan ? `, ${kurulKullanilan} kullandın` : ''}.</p>`;
+    h += `<section class="bolum"><h2>${esc(kurul)} kurulu</h2><p>${kurulToplam} pratik, kurulda toplam ${kurulHak} devamsızlık hakkı (ders başına en fazla 1)${kurulKullanilan ? `, ${kurulKullanilan} kullandın, ${Math.max(kurulHak - kurulKullanilan, 0)} kaldı` : ''}.</p>`;
     for (const [a, l] of satirlar) {
       const ders = a.split('|')[1];
       const gecerli = l.filter(p => !p.iptal);
       const hak = hakHesap(gecerli.length);
       const kullanilan = gecerli.filter(p => durum.gitmedim[`${p.tarih}|${p.ders}`]).length;
-      const kalan = hak - kullanilan;
-      h += `<div class="kart" style="--hat:${hat(ders)}"><div class="hak"><div class="say">${Math.max(kalan, 0)}<small>hak</small></div><div><b>${esc(ders)}</b><div class="ipucu">${gecerli.length} pratik, ${hak ? hak + ' devamsızlık hakkı' : 'devamsızlık hakkı yok'}${kalan < 0 ? '. Hakkın bitti' : ''}</div></div></div>
+      const kalan = Math.min(hak - kullanilan, kurulHak - kurulKullanilan);
+      h += `<div class="kart" style="--hat:${hat(ders)}"><div class="hak"><div class="say">${Math.max(kalan, 0)}<small>hak</small></div><div><b>${esc(ders)}</b><div class="ipucu">${gecerli.length} pratik, ${hak ? 'ders başına 1 hak' : 'hak yok, gitmek zorunlu'}${kalan < 0 ? '. Hakkın bitti' : ''}</div></div></div>
       <div class="cubuk">${gecerli.map(p => `<i class="${durum.gitmedim[`${p.tarih}|${p.ders}`] ? 'gitmedi' : p.tarih < bugun ? 'gitti' : p.tarih === bugun ? 'bugun' : ''}"></i>`).join('')}</div>
       <div style="margin-top:6px">${l.map(p => { const anahtar = `${p.tarih}|${p.ders}`; const [vb, ve] = pratikSaati(p.tarih); return `<div class="satir"><div class="tarih">${tarihten(p.tarih).getDate()} ${AY_ADI[tarihten(p.tarih).getMonth()].slice(0, 3)}<small>${GUN_KISA[tarihten(p.tarih).getDay()]}</small></div><div class="ne"><b>${p.iptal ? 'İptal' : (p.bas ? (p.bit ? p.bas + '–' + p.bit : p.bas) : vb + '–' + ve)}</b><span>${[p.altgrup ? 'Alt grup ' + esc(p.altgrup) : '', p.sinav ? 'Pratik sınavı' : ''].filter(Boolean).join(', ')}</span></div>${p.tarih <= bugun && !p.iptal ? `<button class="secim" data-gitmedim="${esc(anahtar)}" aria-pressed="${!!durum.gitmedim[anahtar]}">Gitmedim</button>` : '<span></span>'}</div>`; }).join('')}</div></div>`;
     }
     h += `</section>`;
   }
-  h += `<p class="ipucu">Devamsızlık: bir derste en fazla 1 hak; tek pratiği olan derse gitmek zorunlu. Kurulda toplam: 9 pratiğe kadar 1, 10-14 pratikte 2 hak. Rapor devamsızlık sayılmaz, pratiğin asistanına verilir.</p>`;
+  h += `<p class="ipucu">Devamsızlık: kurulda toplam 9 pratiğe kadar 1, 10-14 pratikte 2 hak (en fazla 2). Bir derste en fazla 1 hak; tek pratiği olan derse gitmek zorunlu. Pratik sınavı olan ders kendi kuralını koyabilir. Rapor devamsızlık sayılmaz, pratiğin asistanına verilir.</p>`;
   return h;
 }
 
