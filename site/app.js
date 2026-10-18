@@ -52,7 +52,8 @@ let durum = {
   program: depo.al('program', ''),
   grup: depo.al('grup', ''),
   gitmedim: depo.al('gitmedim', {}),
-  benim: []                        // numaranın listelerdeki oturumları
+  benim: [],                       // numaranın listelerdeki oturumları
+  istisna: {}                      // 'kurul|Ders' → bu derste geçerli grup (bölüm listesi standarttan farklıysa)
 };
 
 /* ---------- grup ve oturumlar ---------- */
@@ -75,8 +76,11 @@ async function ozetle(no) {
 async function benimOturumlar() {
   if (!LISTE || !durum.numara || !crypto.subtle) return [];
   const h = await ozetle(durum.numara);
+  durum.istisna = {};
+  for (const l of LISTE.istisna || []) if (l.gruplar[h]) durum.istisna[`${l.kurul}|${l.ders}`] = l.gruplar[h];
   return (LISTE.numara[h] || []).map(i => LISTE.oturumlar[i]);
 }
+const dersGrubu = (kurul, ders) => durum.istisna[`${kurul}|${ders}`] || durum.grup;
 
 /* bir gün için öğrencinin pratikleri: tablo + liste + temsilci düzeltmesi */
 function grupUyar(deger, grup) {
@@ -91,8 +95,9 @@ function pratikler(gun) {
     for (const satir of k.gunler) {
       if (satir.tarih !== gun) continue;
       for (const [ders, deger] of Object.entries(satir.degerler)) {
-        if (!grupUyar(deger, g)) continue;
-        out.push({ ders, kurul: k.kurul, deger, kaynak: 'Pratik dönüşüm tablosu', sinav: satir.notlar?.[ders] === 'sınav' });
+        const dg = dersGrubu(k.kurul, ders);
+        if (!grupUyar(deger, dg)) continue;
+        out.push({ ders, kurul: k.kurul, deger, grup: dg, istisna: dg !== g, kaynak: 'Pratik dönüşüm tablosu', sinav: satir.notlar?.[ders] === 'sınav' });
       }
     }
   }
@@ -112,8 +117,9 @@ function pratikler(gun) {
   for (const d of VERI.duzeltmeler || []) {
     if (d.tarih !== gun) continue;
     if (d.program !== 'hepsi' && d.program !== durum.program) continue;
-    if (d.grup !== 'hepsi' && d.grup !== g && d.grup !== g[0]) continue;
     let p = out.find(x => x.ders.toLocaleLowerCase('tr') === d.ders.toLocaleLowerCase('tr'));
+    const dg = p?.grup || g;
+    if (d.grup !== 'hepsi' && d.grup !== dg && d.grup !== dg[0]) continue;
     if (!p && (d.durum === 'ek' || d.durum === 'değişti')) { p = { ders: d.ders, kaynak: 'Temsilci' }; out.push(p); }
     if (!p) continue;
     if (d.bas) { p.bas = d.bas; p.bit = d.bit; p.saatKaynak = 'Temsilci'; }
@@ -163,7 +169,7 @@ function durakPratik(p, gun) {
   const bas = p.bas || vb, bit = p.bit || (p.bas ? String(Math.min(dk(p.bas) + 45, dk(ve)) / 60 | 0).padStart(2, '0') + ':' + String(Math.min(dk(p.bas) + 45, dk(ve)) % 60).padStart(2, '0') : ve);
   const yer = p.yer || YER[p.ders] || '';
   const etiket = [
-    `<span class="etiket hat">${p.altgrup ? 'Alt grup ' + esc(p.altgrup) : 'Grup ' + esc(durum.grup)}</span>`,
+    `<span class="etiket hat">${p.altgrup ? 'Alt grup ' + esc(p.altgrup) : 'Grup ' + esc(p.grup || durum.grup)}</span>`,
     kesin ? `<span class="etiket kesin">Saat kesin</span>` : `<span class="etiket belirsiz">Kesin saat henüz duyurulmadı</span>`,
     p.sinav ? `<span class="etiket dikkat">Pratik sınavı</span>` : ''
   ].join('');
@@ -172,7 +178,7 @@ function durakPratik(p, gun) {
     <div class="icerik"><div class="ders">${esc(p.ders)} pratiği${p.iptal ? ' · iptal' : ''}</div>
     ${yer ? `<div class="alt">${esc(yer)}</div>` : ''}${p.not ? `<div class="alt">${esc(p.not)}</div>` : ''}
     <div class="etiketler">${etiket}</div>
-    ${p.ders === 'Biyokimya' && !p.altgrup ? `<div class="alt" style="margin-top:8px">Biyokimya listesi bazı numaralarda standart gruptan farklı (ör. 290-300 arası 4b yazılmış). Kesin grubunu pratik salonunun kapısındaki listeden kontrol et.</div>` : ''}
+    ${p.istisna ? `<div class="alt" style="margin-top:8px">${esc(p.ders)} listesinde grubun <b>${esc(p.grup)}</b>; diğer derslerde ${esc(durum.grup)}.</div>` : ''}
     <div class="kaynak">Kaynak: ${esc([p.kaynak, p.saatKaynak && p.saatKaynak !== p.kaynak ? 'saat: ' + p.saatKaynak : ''].filter(Boolean).join(', '))}</div></div></li>` };
 }
 
@@ -248,7 +254,7 @@ function gorPratik() {
       const kalan = hak - kullanilan;
       h += `<div class="kart" style="--hat:${hat(ders)}"><div class="hak"><div class="say">${Math.max(kalan, 0)}<small>hak</small></div><div><b>${esc(ders)}</b><div class="ipucu">${gecerli.length} pratik, ${hak ? hak + ' devamsızlık hakkı' : 'devamsızlık hakkı yok'}${kalan < 0 ? '. Hakkını aştın, temsilciye sor' : ''}</div></div></div>
       <div class="cubuk">${gecerli.map(p => `<i class="${durum.gitmedim[`${p.tarih}|${p.ders}`] ? 'gitmedi' : p.tarih < bugun ? 'gitti' : p.tarih === bugun ? 'bugun' : ''}"></i>`).join('')}</div>
-      <div style="margin-top:6px">${l.map(p => { const anahtar = `${p.tarih}|${p.ders}`; const [vb] = pratikSaati(p.tarih); return `<div class="satir"><div class="tarih">${tarihten(p.tarih).getDate()} ${AY_ADI[tarihten(p.tarih).getMonth()].slice(0, 3)}<small>${GUN_KISA[tarihten(p.tarih).getDay()]}</small></div><div class="ne"><b>${p.iptal ? 'İptal' : (p.bas ? (p.bit ? p.bas + '–' + p.bit : 'Başlangıç ' + p.bas) : vb + ' ve sonrası')}</b><span>${p.altgrup ? 'Alt grup ' + esc(p.altgrup) : 'Grup ' + esc(durum.grup)}${p.sinav ? ', pratik sınavı' : ''}</span></div>${p.tarih <= bugun && !p.iptal ? `<button class="secim" data-gitmedim="${esc(anahtar)}" aria-pressed="${!!durum.gitmedim[anahtar]}">${durum.gitmedim[anahtar] ? 'Gitmedim' : 'Gittim'}</button>` : '<span></span>'}</div>`; }).join('')}</div></div>`;
+      <div style="margin-top:6px">${l.map(p => { const anahtar = `${p.tarih}|${p.ders}`; const [vb] = pratikSaati(p.tarih); return `<div class="satir"><div class="tarih">${tarihten(p.tarih).getDate()} ${AY_ADI[tarihten(p.tarih).getMonth()].slice(0, 3)}<small>${GUN_KISA[tarihten(p.tarih).getDay()]}</small></div><div class="ne"><b>${p.iptal ? 'İptal' : (p.bas ? (p.bit ? p.bas + '–' + p.bit : 'Başlangıç ' + p.bas) : vb + ' ve sonrası')}</b><span>${p.altgrup ? 'Alt grup ' + esc(p.altgrup) : 'Grup ' + esc(p.grup || durum.grup)}${p.sinav ? ', pratik sınavı' : ''}</span></div>${p.tarih <= bugun && !p.iptal ? `<button class="secim" data-gitmedim="${esc(anahtar)}" aria-pressed="${!!durum.gitmedim[anahtar]}">${durum.gitmedim[anahtar] ? 'Gitmedim' : 'Gittim'}</button>` : '<span></span>'}</div>`; }).join('')}</div></div>`;
     }
     h += `</section>`;
   }

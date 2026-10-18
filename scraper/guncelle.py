@@ -130,7 +130,7 @@ def main():
         durum['kopru_alindi'] = kopru.get('alindi')
 
     # 4) Bölüm listeleri (liste_ice_aktar.py ile isimsizleştirilmiş JSON'lar)
-    oturumlar, numara = [], {}
+    oturumlar, numara, istisna = [], {}, []
     liste_klasoru = os.path.join(KAYNAK, 'listeler')
     for ad in sorted(os.listdir(liste_klasoru)) if os.path.isdir(liste_klasoru) else []:
         if not ad.endswith('.json'):
@@ -138,6 +138,8 @@ def main():
         yol = os.path.join(liste_klasoru, ad)
         l = oku_json(yol, {})
         kaynak_durumu('liste_' + ad, f"{l.get('ders')} pratik listesi ({l.get('kurul')})", '', ozet(open(yol, 'rb').read()))
+        if l.get('gruplar'):
+            istisna.append({'kurul': l['kurul'], 'ders': l['ders'], 'gruplar': l['gruplar']})
         for o in l.get('oturumlar', []):
             i = len(oturumlar)
             for h in o.pop('numaralar'):
@@ -163,7 +165,7 @@ def main():
     if yeni_kayit:
         gunluk = yeni_kayit + gunluk
     yaz_json(os.path.join(DATA, 'veri.json'), veri)
-    yaz_json(os.path.join(DATA, 'liste.json'), {'tuz': TUZ, 'oturumlar': oturumlar, 'numara': numara})
+    yaz_json(os.path.join(DATA, 'liste.json'), {'tuz': TUZ, 'oturumlar': oturumlar, 'numara': numara, 'istisna': istisna})
     yaz_json(os.path.join(DATA, 'degisiklikler.json'), gunluk[:300])
     yaz_json(os.path.join(DATA, 'durum.json'), durum)
     takvim.yaz(veri, {'oturumlar': oturumlar, 'numara': numara}, DATA, SIMDI.astimezone(dt.timezone.utc).strftime('%Y%m%dT%H%M%SZ'))
