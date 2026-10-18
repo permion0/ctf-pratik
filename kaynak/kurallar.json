@@ -23,12 +23,9 @@
     "2026-09-22",
     "2026-09-23",
     "2026-09-24"
-   ],
-   "ilk": "a"
+   ]
   },
   "Anatomi": {
-   "sira": "ab_donusumlu",
-   "ilk": "birlikte",
    "saatler": [
     "13:00",
     "14:00"
@@ -38,8 +35,10 @@
    "onluk": "Önlük önerilir"
   },
   "Biyofizik": {
+   "sira": "liste",
    "yer": "Temel Bilimler B Blok 2. kat",
-   "onluk": "Önlük gerekli"
+   "onluk": "Önlük gerekli",
+   "not": "Alt grup ve saat, bölüm listesi yayınlanınca belli olur"
   }
  },
  "varsayilan": {

@@ -69,6 +69,8 @@ def kural_saati(veri, ders, kurul, grup, tarih):
             ilk = k.get('ilk', 'a'); once = ilk if i % 2 == 0 else ('b' if ilk == 'a' else 'a')
         bas = k['saatler'][0] if once == 'birlikte' or grup[1:] == once else k['saatler'][1]
         return bas, _ekle(bas, k.get('sure', 60)), ('İki grup birlikte girer' if once == 'birlikte' else f'Bu sefer önce {grup[0]}{once} girer') + ' (tahmini)'
+    if k.get('sira') == 'liste':
+        return None
     if k.get('bas') or k.get('saatler'):
         bas = k.get('bas') or k['saatler'][0]
         return bas, _ekle(bas, k.get('sure', 60)), 'Tahmini saat'
@@ -110,7 +112,7 @@ def grup_olaylari(veri, program, grup, damga, kesinler=None, bolum=None):
                     bas, bit, aciklama = kural[0], kural[1], f'Grup {dg}. {kural[2]}'
                 else:
                     bas, bit = (slot['bas'], slot['bit']) if slot else ('13:30', '16:15')
-                    aciklama = f'Grup {dg}, saat belli değil'
+                    aciklama = f'Grup {dg}. ' + (((veri.get('kurallar') or {}).get(ders) or {}).get('not') or 'Saat belli değil')
                 yer = ((veri.get('kurallar') or {}).get(ders) or {}).get('yer') or PRATIK_YER.get(ders, '')
                 out += _olay(_uid(program, grup, g['tarih'], ders), g['tarih'], bas, bit, f'{ders} pratiği', yer, aciklama, damga)
             if g.get('olay') and ('SINAV' in g['olay']['ad'] or 'ARASINAV' in g['olay']['ad']):

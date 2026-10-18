@@ -124,6 +124,7 @@ function pratikler(gun) {
         p.tahmini = true;
         p.siraNotu = once === 'birlikte' ? 'İki grup birlikte girer' : `Bu sefer önce ${g[0]}${once} girer`;
       }
+    } else if (k.sira === 'liste') { p.listeBekleniyor = true;
     } else if (k.bas || k.saatler) { p.bas = k.bas || k.saatler[0]; p.bit = saatEkle(p.bas, k.sure || 60); p.tahmini = true; }
   }
   // temsilci düzeltmeleri
@@ -205,7 +206,7 @@ function durakPratik(p, gun) {
   const yer = p.yer || k.yer || '';
   const etiket = [
     `<span class="etiket hat">${p.altgrup ? 'Alt grup ' + esc(p.altgrup) : 'Grup ' + esc(p.grup || durum.grup)}</span>`,
-    !kesin ? `<span class="etiket belirsiz">Saat belli değil</span>` : p.tahmini ? `<span class="etiket belirsiz">Tahmini saat</span>` : '',
+    !kesin ? `<span class="etiket belirsiz">${p.listeBekleniyor ? 'Liste bekleniyor' : 'Saat belli değil'}</span>` : p.tahmini ? `<span class="etiket belirsiz">Tahmini saat</span>` : '',
     k.onluk ? `<span class="etiket">${esc(k.onluk)}</span>` : '',
     p.sinav ? `<span class="etiket dikkat">Pratik sınavı</span>` : ''
   ].join('');
@@ -214,7 +215,7 @@ function durakPratik(p, gun) {
     <div class="icerik"><div class="ders">${esc(p.ders)} pratiği${p.iptal ? ' (iptal)' : ''}</div>
     ${yer ? `<div class="alt">${esc(yer)}</div>` : ''}${p.not ? `<div class="alt">${esc(p.not)}</div>` : ''}
     <div class="etiketler">${etiket}</div>
-    ${(() => { const n = [p.istisna ? `${p.ders} listesinde ${p.grup} grubundasın.` : '', p.siraNotu ? p.siraNotu + '.' : (k.not ? k.not + '.' : '')].filter(Boolean).join(' '); return n ? `<div class="alt" style="margin-top:8px">${esc(n)}</div>` : ''; })()}
+    ${(() => { const n = [p.istisna ? `${p.ders} listesinde ${p.grup} grubundasın.` : '', p.siraNotu ? p.siraNotu + '.' : (k.not && !p.altgrup ? k.not + '.' : '')].filter(Boolean).join(' '); return n ? `<div class="alt" style="margin-top:8px">${esc(n)}</div>` : ''; })()}
     </div></div></li>` };
 }
 
