@@ -14,7 +14,7 @@ const depo = {
 const GUN_ADI = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
 const GUN_KISA = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
 const AY_ADI = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
-const PROGRAM_AD = { TR: 'Türkçe Tıp · EKU amfisi', MT: 'Türkçe Tıp · MT amfisi', EN: 'İngilizce Tıp' };
+const PROGRAM_AD = { TR: 'Türkçe Tıp', MT: 'Türkçe Tıp', EN: 'İngilizce Tıp' };
 
 /* Pratik yerleri: okulun öğrenci portalındaki "1001 Pratikleri" bilgisi */
 const YER = {
@@ -172,6 +172,7 @@ function durakPratik(p, gun) {
     <div class="icerik"><div class="ders">${esc(p.ders)} pratiği${p.iptal ? ' · iptal' : ''}</div>
     ${yer ? `<div class="alt">${esc(yer)}</div>` : ''}${p.not ? `<div class="alt">${esc(p.not)}</div>` : ''}
     <div class="etiketler">${etiket}</div>
+    ${p.ders === 'Biyokimya' && !p.altgrup ? `<div class="alt" style="margin-top:8px">Biyokimya listesi bazı numaralarda standart gruptan farklı (ör. 290-300 arası 4b yazılmış). Kesin grubunu pratik salonunun kapısındaki listeden kontrol et.</div>` : ''}
     <div class="kaynak">Kaynak: ${esc([p.kaynak, p.saatKaynak && p.saatKaynak !== p.kaynak ? 'saat: ' + p.saatKaynak : ''].filter(Boolean).join(', '))}</div></div></li>` };
 }
 
@@ -275,15 +276,11 @@ function gorBen() {
   <section class="bolum"><h2>Bu site ne yapıyor?</h2><div class="kart ipucu">Okulun öğrenci portalındaki pratik dönüşüm tablosunu, Drive'daki ders programını, bölümlerin pratik listelerini ve temsilcinin düzeltmelerini 15 dakikada bir okur. Numaran bu telefonda kalır; sunucuya gönderilmez. Sitede öğrenci adı yoktur.</div></section>`;
 }
 function formNumara(ilk) {
-  const ing = durum.numara.startsWith('0902');
   return `<form id="numform" class="alan" novalidate>
     <label for="no">Öğrenci numaran</label>
     <input id="no" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="0901260…" value="${esc(durum.numara)}">
     <div class="ipucu">Grubun numarandan bulunur. Numara bu telefonda kalır.</div>
     <div class="hata" id="nohata" hidden></div>
-    ${!ing ? `<div class="alan" style="margin-top:8px"><label>Teorik dersler hangi amfide?</label><div class="ikili">
-      <button type="button" data-program="TR" aria-pressed="${durum.program !== 'MT'}"><b>EKU</b><span>Türkçe tıp programı</span></button>
-      <button type="button" data-program="MT" aria-pressed="${durum.program === 'MT'}"><b>MT</b><span>Türkçe tıp, MT amfisi</span></button></div></div>` : ''}
     ${durum.grup && !ilk ? `<div class="ipucu">Grubun: <b>${esc(durum.grup)}</b>. Bölüm listesinde başka bir alt gruptaysan Pratiklerim'de o görünür.</div>` : ''}
     <button class="dugme" type="submit">${ilk ? 'Programımı göster' : 'Kaydet'}</button></form>`;
 }
@@ -336,7 +333,7 @@ function bagla() {
     const g = gruptan(no);
     if (!g) { hata.hidden = false; hata.textContent = 'Bu numara 1. sınıf gruplarının hiçbirinde yok. Numarayı kontrol et.'; return; }
     durum.numara = no; durum.grup = g;
-    durum.program = no.startsWith('0902') ? 'EN' : (durum.program === 'MT' ? 'MT' : 'TR');
+    durum.program = no.startsWith('0902') ? 'EN' : 'TR';
     depo.koy('numara', no); depo.koy('grup', g); depo.koy('program', durum.program);
     durum.benim = await benimOturumlar();
     durum.sekme = 'bugun'; ciz(); window.scrollTo({ top: 0 });
