@@ -58,7 +58,7 @@ let durum = {
 
 /* ---------- grup ve oturumlar ---------- */
 function gruptan(no) {
-  if (!VERI) return '';
+  if (!VERI || !/^(09|48)\d{8}$/.test(no)) return '';
   const n = Number(no);
   for (const g of VERI.gruplar) {
     const bas = Number(g.bas), bit = g.bit ? Number(g.bit) : null;
