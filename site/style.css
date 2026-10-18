@@ -195,3 +195,10 @@ main { padding-block: 6px 24px; display: flex; flex-direction: column; gap: 18px
 .satir.sinav.tatil .tarih, .satir.sinav.toren .tarih { color: var(--soluk); }
 details.gecmis > summary { cursor: pointer; font: 700 16px var(--f-levha); color: var(--soluk); min-height: 44px; display: flex; align-items: center; }
 .gezinti button { font-size: 12px; }
+
+/* Sınavlar | Tatil ve törenler seçici */
+.ikili-sec { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; background: var(--yumusak); border-radius: 14px; }
+.ikili-sec button { min-height: 44px; border: 0; border-radius: 11px; background: none; color: var(--soluk); font: 700 15px var(--f-govde); }
+.ikili-sec button[aria-selected="true"] { background: var(--kagit); color: var(--murekkep); box-shadow: var(--golge); }
+.tatilkart { --hat: var(--vurgu); }
+.tatilkart .sayac { color: var(--vurgu); }

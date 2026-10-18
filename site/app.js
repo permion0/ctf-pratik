@@ -48,6 +48,7 @@ let durum = {
   program: depo.al('program', ''),
   grup: depo.al('grup', ''),
   gitmedim: depo.al('gitmedim', {}),
+  sinavGorunum: depo.al('sinavGorunum', 'sinav'),
   benim: [],                       // numaranın listelerdeki oturumları
   istisna: {}                      // 'kurul|Ders' → bu derste geçerli grup (bölüm listesi standarttan farklıysa)
 };
@@ -371,23 +372,32 @@ function sinavSatiri(o) {
 }
 function gorSinavlar() {
   const tum = sinavlar(), bugun = iso(new Date());
-  const sinav = tum.filter(o => o.tur !== 'tatil' && o.tur !== 'toren');
-  const gelecek = sinav.filter(o => o.tarih >= bugun && !o.iptal);
-  let h = '';
-  const sira = gelecek[0];
-  if (sira) {
-    const n = kalanGun(sira.tarih), d = tarihten(sira.tarih);
-    h += `<section class="siradaki sinavkart"><div class="ne">Sıradaki sınav</div><div class="baslik">${esc(sira.baslik)}</div>
-      <div class="ayrinti"><span>${d.getDate()} ${AY_ADI[d.getMonth()]} ${GUN_ADI[d.getDay()]}</span><span>${esc(sira.saat || 'Saat henüz duyurulmadı')}</span></div>
+  const gorunum = durum.sinavGorunum || 'sinav';
+  let h = `<div class="ikili-sec" role="tablist" aria-label="Görünüm">
+    <button role="tab" data-sinavgor="sinav" aria-selected="${gorunum === 'sinav'}">Sınavlar</button>
+    <button role="tab" data-sinavgor="tatil" aria-selected="${gorunum === 'tatil'}">Tatil ve törenler</button></div>`;
+  const kart = (o, ust) => {
+    const n = kalanGun(o.tarih), d = tarihten(o.tarih), b = o.bitis ? tarihten(o.bitis) : null;
+    const tarihMetni = b ? `${d.getDate()}–${b.getDate()} ${AY_ADI[b.getMonth()]}` : `${d.getDate()} ${AY_ADI[d.getMonth()]} ${GUN_ADI[d.getDay()]}`;
+    const ikinci = o.tur === 'tatil' || o.tur === 'toren' ? (o.not || '') : (o.saat || 'Saat henüz duyurulmadı');
+    return `<section class="siradaki sinavkart ${o.tur === 'tatil' || o.tur === 'toren' ? 'tatilkart' : ''}"><div class="ne">${ust}</div><div class="baslik">${esc(o.baslik)}</div>
+      <div class="ayrinti"><span>${tarihMetni}</span>${ikinci ? `<span>${esc(ikinci)}</span>` : ''}</div>
       <div class="sayac">${n === 0 ? 'Bugün' : n === 1 ? 'Yarın' : `<b>${n}</b> gün`}</div></section>`;
+  };
+  if (gorunum === 'sinav') {
+    const sinav = tum.filter(o => o.tur !== 'tatil' && o.tur !== 'toren');
+    const gelecek = sinav.filter(o => o.tarih >= bugun && !o.iptal);
+    if (gelecek[0]) h += kart(gelecek[0], 'Sıradaki sınav');
+    if (VERI.ortak_gorsel_degisti) h += `<div class="serit bilgi">Ortak ders sınav tarihleri görseli güncellendi; aşağıdaki ortak ders tarihleri kontrol edilene kadar eski olabilir.</div>`;
+    h += `<section class="bolum"><h2>Yaklaşan sınavlar</h2><div class="kart">${gelecek.map(sinavSatiri).join('') || '<div class="bos"><b>Yaklaşan sınav yok</b></div>'}</div></section>`;
+    const gecmis = sinav.filter(o => o.tarih < bugun).reverse();
+    if (gecmis.length) h += `<details class="bolum gecmis"><summary>Geçmiş sınavlar (${gecmis.length})</summary><div class="kart">${gecmis.map(sinavSatiri).join('')}</div></details>`;
+    h += `<p class="ipucu">Kurul sınavlarının saati önce yaklaşık verilir, son hafta kesinleşir. Kesin saat duyurulunca burada görünür.</p>`;
+  } else {
+    const tatil = tatilGrupla(tum.filter(o => o.tur === 'tatil' || o.tur === 'toren')).filter(o => (o.bitis || o.tarih) >= bugun);
+    if (tatil[0]) h += kart(tatil[0], tatil[0].tur === 'toren' ? 'Sıradaki tören' : 'Sıradaki tatil');
+    h += `<section class="bolum"><h2>Tatiller ve törenler</h2><div class="kart">${tatil.map(sinavSatiri).join('') || '<div class="bos"><b>Yaklaşan tatil yok</b></div>'}</div></section>`;
   }
-  if (VERI.ortak_gorsel_degisti) h += `<div class="serit bilgi">Ortak ders sınav tarihleri görseli güncellendi; aşağıdaki ortak ders tarihleri kontrol edilene kadar eski olabilir.</div>`;
-  h += `<section class="bolum"><h2>Yaklaşan sınavlar</h2><div class="kart">${gelecek.map(sinavSatiri).join('') || '<div class="bos"><b>Yaklaşan sınav yok</b></div>'}</div></section>`;
-  const tatil = tatilGrupla(tum.filter(o => (o.tur === 'tatil' || o.tur === 'toren') && (o.bitis || o.tarih) >= bugun));
-  if (tatil.length) h += `<section class="bolum"><h2>Tatiller ve törenler</h2><div class="kart">${tatil.map(sinavSatiri).join('')}</div></section>`;
-  const gecmis = sinav.filter(o => o.tarih < bugun).reverse();
-  if (gecmis.length) h += `<details class="bolum gecmis"><summary>Geçmiş sınavlar (${gecmis.length})</summary><div class="kart">${gecmis.map(sinavSatiri).join('')}</div></details>`;
-  h += `<p class="ipucu">Kurul sınavlarının saati önce yaklaşık verilir, son hafta kesinleşir. Kesin saat duyurulunca burada görünür.</p>`;
   return h;
 }
 
@@ -446,6 +456,7 @@ function isaretleSimdi() {
 }
 function bagla() {
   document.querySelectorAll('[data-gun]').forEach(b => b.onclick = () => { durum.gun = b.dataset.gun; ciz(); });
+  document.querySelectorAll('[data-sinavgor]').forEach(b => b.onclick = () => { durum.sinavGorunum = b.dataset.sinavgor; depo.koy('sinavGorunum', durum.sinavGorunum); ciz(); window.scrollTo({ top: 0 }); });
   document.querySelectorAll('[data-hafta]').forEach(b => b.onclick = () => { durum.gun = iso(ekle(tarihten(durum.gun), +b.dataset.hafta)); ciz(); });
   document.querySelectorAll('[data-git]').forEach(b => b.onclick = () => sekmeyeGit(b.dataset.git));
   document.querySelectorAll('[data-gitmedim]').forEach(b => b.onclick = () => {
