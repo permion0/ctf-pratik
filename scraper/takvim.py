@@ -83,7 +83,7 @@ def grup_olaylari(veri, program, grup, damga, kesinler=None, bolum=None):
     gunler = (veri.get('programlar') or {}).get(program, {}).get('gunler', {})
     for tarih, liste in gunler.items():
         for x in liste:
-            if x['tur'] == 'pratik':
+            if x['tur'] in ('pratik', 'olay'):
                 continue
             out += _olay(_uid(program, tarih, x['bas'], x['ders']), tarih, x['bas'], x['bit'], x['ders'],
                          x.get('yer', ''), ', '.join(filter(None, [x.get('abd'), x.get('hoca')])), damga)
@@ -115,8 +115,39 @@ def grup_olaylari(veri, program, grup, damga, kesinler=None, bolum=None):
                     aciklama = f'Grup {dg}. ' + (((veri.get('kurallar') or {}).get(ders) or {}).get('not') or 'Saat belli değil')
                 yer = ((veri.get('kurallar') or {}).get(ders) or {}).get('yer') or PRATIK_YER.get(ders, '')
                 out += _olay(_uid(program, grup, g['tarih'], ders), g['tarih'], bas, bit, f'{ders} pratiği', yer, aciklama, damga)
-            if g.get('olay') and ('SINAV' in g['olay']['ad'] or 'ARASINAV' in g['olay']['ad']):
-                out += _olay(_uid('olay', g['tarih'], g['olay']['ad']), g['tarih'], '09:00', '12:00', g['olay']['ad'].title(), '', 'Saati programdan kontrol et', damga)
+    out += sinav_olaylari(veri, program, damga)
+    return out
+
+
+TUR_AD = {'ara': 'ara sınavı', 'final': 'final sınavı', 'butunleme': 'bütünleme sınavı', 'sinav': 'sınavı'}
+
+
+def _tumgun(uid, tarih, baslik, aciklama, damga):
+    d = tarih.replace('-', '')
+    import datetime as _dt
+    ertesi = (_dt.date.fromisoformat(tarih) + _dt.timedelta(days=1)).strftime('%Y%m%d')
+    return ['BEGIN:VEVENT', f'UID:{uid}@ctf-pratik', 'DTSTAMP:20260901T000000Z', f'DTSTART;VALUE=DATE:{d}', f'DTEND;VALUE=DATE:{ertesi}',
+            f'SUMMARY:{_kac(baslik)}', f'DESCRIPTION:{_kac(aciklama)}', 'END:VEVENT']
+
+
+def sinav_olaylari(veri, program, damga):
+    """Kurul sınavları, törenler ve tatiller (Drive programı) + ortak ders sınavları. Saat bilinmiyorsa tüm gün."""
+    out = []
+    for o in ((veri.get('programlar') or {}).get(program) or {}).get('onemli', []):
+        if o['tur'] in ('tatil', 'toren'):
+            ad = 'Beyaz Önlük Töreni' if o['tur'] == 'toren' else (re.search(r'\(([^)]+)\)', o['metin']) or [None, o['metin']])[1]
+            out += _tumgun(_uid('onemli', o['tarih'], o['tur']), o['tarih'], ad, 'Ders programından', damga)
+            continue
+        baslik = f"{o['kurul'] + ' kurulu ' if o.get('kurul') else ''}{TUR_AD.get(o['tur'], 'sınavı')}"
+        if o.get('saat'):
+            out += _olay(_uid('sinav', o['tarih'], o['tur']), o['tarih'], o['saat'], _ekle(o['saat'], 120), baslik, '',
+                         'Programdaki saat; son hafta kesinleşir. Bitiş saati tahmini.', damga)
+        else:
+            out += _tumgun(_uid('sinav', o['tarih'], o['tur']), o['tarih'], baslik, 'Saat henüz duyurulmadı', damga)
+    for o in veri.get('ortak_sinavlar') or []:
+        baslik = f"{o['ders']} {TUR_AD.get(o['tur'], 'sınavı')}"
+        out += _olay(_uid('ortak', o['tarih'], o['ders'], o['tur']), o['tarih'], o['saat'], _ekle(o['saat'], 60), baslik, '',
+                     'Ortak Dersler Bölümü sınav tarihleri. Bitiş saati tahmini.', damga)
     return out
 
 

@@ -125,6 +125,16 @@ def main():
         kaynak_durumu('drive_program', 'Ders programı (Drive)', durum.get('program_url', ''),
                       ozet(json.dumps(kopru['program'], sort_keys=True).encode()))
         programlar = programcoz.oku(kopru['program'])
+        # pratik tablosunda olup programda olmayan tatil/törenler (Yılbaşı, Tıp Bayramı gibi)
+        for kod, pr in programlar.items():
+            var = {o['tarih'] for o in pr.get('onemli', [])}
+            for kk in (pratik or {}).get('kurullar', []):
+                for g in kk['gunler']:
+                    ad = (g.get('olay') or {}).get('ad', '')
+                    if g['tarih'] not in var and re.search(r'BAYRAM|YILBAŞI|TÖREN', ad):
+                        pr.setdefault('onemli', []).append({'tarih': g['tarih'], 'tur': 'toren' if 'TÖREN' in ad else 'tatil', 'kurul': None, 'saat': None,
+                                                            'metin': {'YILBAŞI': 'Yılbaşı', 'TIP BAYRAMI': 'Tıp Bayramı'}.get(ad, ad), 'kaynak': 'pratik'})
+            pr['onemli'] = sorted(pr.get('onemli', []), key=lambda o: o['tarih'])
         kaynak_durumu('duzeltmeler', 'Düzeltmeler (temsilci)', '', ozet(json.dumps(kopru.get('duzeltmeler', [])).encode()))
         duzeltmeler = programcoz.duzeltmeler(kopru.get('duzeltmeler', []))
         durum['kopru_alindi'] = kopru.get('alindi')
@@ -153,6 +163,8 @@ def main():
         'programlar': programlar,
         'duzeltmeler': duzeltmeler,
         'kurallar': oku_json(os.path.join(KAYNAK, 'kurallar.json'), {}).get('dersler', {}),
+        'ortak_sinavlar': oku_json(os.path.join(KAYNAK, 'ortak_sinavlar.json'), {}).get('sinavlar', []),
+        'ortak_gorsel_degisti': (oku_json(os.path.join(KAYNAK, 'ortak_sinavlar.json'), {}).get('gorsel_sha') or '') != ((durum['kaynaklar'].get('ortak_sinav') or {}).get('ozet') or ''),
         'kural_varsayilan': oku_json(os.path.join(KAYNAK, 'kurallar.json'), {}).get('varsayilan', {}),
         'kaynaklar': list(durum['kaynaklar'].values()),
         'kopru_alindi': durum.get('kopru_alindi'),

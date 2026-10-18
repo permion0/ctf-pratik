@@ -173,7 +173,7 @@ function olaylar(gun) {
 }
 function dersler(gun) {
   const p = VERI.programlar?.[durum.program];
-  return (p?.gunler?.[gun] || []).filter(x => x.tur !== 'pratik');
+  return (p?.gunler?.[gun] || []).filter(x => x.tur !== 'pratik' && x.tur !== 'olay');
 }
 function pratikSaati(gun) {
   const p = VERI.programlar?.[durum.program]?.gunler?.[gun] || [];
@@ -231,7 +231,9 @@ function gorBugun() {
   duraklar.sort((a, b) => dk(a.bas) - dk(b.bas));
 
   let h = '';
-  for (const o of ol) h += `<div class="serit" role="status">${esc(olayAdi(o.ad))}${o.dersler?.length && o.dersler.length < 4 ? ': ' + esc(o.dersler.join(', ')) : ''}</div>`;
+  const gunSinav = sinavlar().filter(o => o.tarih === gun);
+  for (const o of gunSinav) h += `<div class="serit${o.tur === 'tatil' || o.tur === 'toren' ? ' bilgi' : ''}" role="status">${esc(o.baslik)}${o.saat ? ', ' + esc(o.saat) : (o.tur === 'tatil' || o.tur === 'toren' ? '' : ', saat henüz duyurulmadı')}</div>`;
+  for (const o of ol.filter(o => !(gunSinav.length && /SINAV|BAYRAM|TÖREN|YILBAŞI/.test(o.ad)))) h += `<div class="serit" role="status">${esc(olayAdi(o.ad))}${o.dersler?.length && o.dersler.length < 4 ? ': ' + esc(o.dersler.join(', ')) : ''}</div>`;
   if (gun === iso(new Date())) h += siradaki(duraklar);
   if (!VERI.programlar?.[durum.program]) h += `<div class="serit bilgi">Ders programı yüklenemedi, sadece pratikler gösteriliyor.</div>`;
   if (duraklar.length) h += `<ol class="guzergah">${duraklar.map(d => d.html).join('')}</ol>`;
@@ -300,6 +302,95 @@ function gorPratik() {
   return h;
 }
 
+/* ---------- sınavlar ve önemli tarihler ---------- */
+const TUR_AD = { ara: 'ara sınavı', final: 'final sınavı', butunleme: 'bütünleme sınavı', sinav: 'sınavı' };
+function tatilAdi(m) {
+  const p = m.match(/\(([^)]+)\)/);
+  let t = p ? p[1] : m.replace(/^\s*\d{1,2}\s+\S+(\s+20\d\d)?(\s+(PAZARTES[İI]|SALI|ÇARŞAMBA|PERŞEMBE|CUMA|CUMARTES[İI]|PAZAR))?\s*:?\s*/i, '');
+  const kucukKal = new Set(['ve', 'and', 'of', 'the']);
+  return t.toLocaleLowerCase('tr').split(/\s+/).map((w, i) => i && kucukKal.has(w) ? w : w.charAt(0).toLocaleUpperCase('tr') + w.slice(1)).join(' ');
+}
+/* ardışık günlerdeki aynı tatili tek satırda topla: "8–12 Mart Ramazan Bayramı" */
+function tatilGrupla(liste) {
+  const kok = b => b.toLocaleLowerCase('tr').replace(/\s*(arifesi|eve)\b/g, '').replace(/\s*\d+\.\s*gün.*$/, '').replace(/\s*day\s*\d.*$/, '').replace(/\s*\/.*$/, '').trim();
+  const out = [];
+  for (const o of liste) {
+    const son = out[out.length - 1];
+    if (son && son.tur === o.tur && kok(son.baslik) === kok(o.baslik) && (tarihten(o.tarih) - tarihten(son.bitis || son.tarih)) / 86400000 <= 3) {
+      son.bitis = o.tarih;
+      if (!/arife|eve/i.test(o.baslik)) son.baslik = o.baslik.replace(/\s*\d+\.\s*Gün.*$|\s*Day\s*\d.*$|\s*\/.*$/i, '');
+    } else out.push({ ...o });
+  }
+  // arife gününde ders varsa yalnızca öğleden sonra tatildir
+  for (const g of out) {
+    const arife = liste.find(o => o.tarih >= g.tarih && o.tarih <= (g.bitis || g.tarih) && /arife|eve/i.test(o.baslik));
+    if (arife && dersler(arife.tarih).length) { const d = tarihten(arife.tarih); g.not = `${d.getDate()} ${AY_ADI[d.getMonth()]} yalnızca öğleden sonra`; }
+  }
+  return out;
+}
+function sinavlar() {
+  const out = [];
+  const prog = VERI.programlar?.[durum.program];
+  for (const o of prog?.onemli || []) {
+    if (o.tur === 'tatil' || o.tur === 'toren') {
+      out.push({ tarih: o.tarih, tur: o.tur, baslik: o.tur === 'toren' ? 'Beyaz Önlük Töreni' : tatilAdi(o.metin), kaynak: 'Ders programı' });
+    } else {
+      out.push({ tarih: o.tarih, tur: 'kurul', baslik: `${o.kurul ? o.kurul + ' kurulu ' : ''}${TUR_AD[o.tur] || 'sınavı'}`, saat: o.saat,
+                 saatNotu: o.saat ? 'Programdaki saat; son hafta kesinleşir' : '', kaynak: 'Ders programı' });
+    }
+  }
+  for (const o of VERI.ortak_sinavlar || []) {
+    out.push({ tarih: o.tarih, tur: 'ortak', baslik: `${o.ders} ${TUR_AD[o.tur] || 'sınavı'}`, saat: o.saat, not: o.secmeli ? 'Seçmeli ders' : '', kaynak: 'Ortak Dersler Bölümü' });
+  }
+  // grubun pratik sınavları (okulun pratik tablosu)
+  for (const k of VERI.pratik?.kurullar || []) for (const g of k.gunler) for (const [ders, n] of Object.entries(g.notlar || {})) {
+    if (n === 'sınav' && grupUyar(g.degerler[ders], dersGrubu(k.kurul, ders))) out.push({ tarih: g.tarih, tur: 'pratik', baslik: `${ders} pratik sınavı`, kaynak: 'Pratik dönüşüm tablosu' });
+  }
+  // temsilci: Düzeltmeler tablosunda "sınav" geçen satırlar saati/yeri günceller ya da yeni sınav ekler
+  for (const d of VERI.duzeltmeler || []) {
+    if (!/s[ıi]nav/i.test(d.ders) || (d.program !== 'hepsi' && d.program !== durum.program)) continue;
+    let o = out.find(x => x.tarih === d.tarih && x.tur !== 'tatil' && x.tur !== 'toren' && (x.tur === 'kurul' || x.baslik.toLocaleLowerCase('tr').includes(d.ders.toLocaleLowerCase('tr').replace(/\s*s[ıi]nav[ıi]?/i, ''))));
+    if (!o) { o = { tarih: d.tarih, tur: 'kurul', baslik: d.ders, kaynak: 'Temsilci' }; out.push(o); }
+    if (d.durum === 'iptal') o.iptal = true;
+    if (d.bas) { o.saat = d.bas; o.saatNotu = 'Temsilci duyurdu'; }
+    if (d.yer) o.yer = d.yer;
+    if (d.not) o.not = d.not;
+  }
+  return out.sort((a, b) => (a.tarih + (a.saat || '')).localeCompare(b.tarih + (b.saat || '')));
+}
+function kalanGun(t) { return Math.round((tarihten(t) - tarihten(iso(new Date()))) / 86400000); }
+function kalanYazi(n) { return n === 0 ? 'Bugün' : n === 1 ? 'Yarın' : n < 0 ? `${-n} gün önce` : `${n} gün kaldı`; }
+function sinavSatiri(o) {
+  const d = tarihten(o.tarih), n = kalanGun(o.tarih);
+  const alt = [o.saat ? o.saat : (o.tur === 'tatil' || o.tur === 'toren' ? '' : 'Saat henüz duyurulmadı'), o.yer, o.saatNotu, o.not, n >= 0 && n <= 90 ? kalanYazi(n) : ''].filter(Boolean).join(', ');
+  const b = o.bitis ? tarihten(o.bitis) : null;
+  const tarihMetni = b ? `${d.getDate()}–${b.getDate()} ${AY_ADI[b.getMonth()].slice(0, 3)}` : `${d.getDate()} ${AY_ADI[d.getMonth()].slice(0, 3)}`;
+  return `<div class="satir sinav ${o.tur} ${n < 0 ? 'gecti' : ''}"><div class="tarih">${tarihMetni}<small>${b ? (b - d) / 86400000 + 1 + ' gün' : GUN_KISA[d.getDay()]}</small></div>
+    <div class="ne"><b>${esc(o.baslik)}${o.iptal ? ' (iptal)' : ''}</b>${alt ? `<span>${esc(alt)}</span>` : ''}</div>
+    </div>`;
+}
+function gorSinavlar() {
+  const tum = sinavlar(), bugun = iso(new Date());
+  const sinav = tum.filter(o => o.tur !== 'tatil' && o.tur !== 'toren');
+  const gelecek = sinav.filter(o => o.tarih >= bugun && !o.iptal);
+  let h = '';
+  const sira = gelecek[0];
+  if (sira) {
+    const n = kalanGun(sira.tarih), d = tarihten(sira.tarih);
+    h += `<section class="siradaki sinavkart"><div class="ne">Sıradaki sınav</div><div class="baslik">${esc(sira.baslik)}</div>
+      <div class="ayrinti"><span>${d.getDate()} ${AY_ADI[d.getMonth()]} ${GUN_ADI[d.getDay()]}</span><span>${esc(sira.saat || 'Saat henüz duyurulmadı')}</span></div>
+      <div class="sayac">${n === 0 ? 'Bugün' : n === 1 ? 'Yarın' : `<b>${n}</b> gün`}</div></section>`;
+  }
+  if (VERI.ortak_gorsel_degisti) h += `<div class="serit bilgi">Ortak ders sınav tarihleri görseli güncellendi; aşağıdaki ortak ders tarihleri kontrol edilene kadar eski olabilir.</div>`;
+  h += `<section class="bolum"><h2>Yaklaşan sınavlar</h2><div class="kart">${gelecek.map(sinavSatiri).join('') || '<div class="bos"><b>Yaklaşan sınav yok</b></div>'}</div></section>`;
+  const tatil = tatilGrupla(tum.filter(o => (o.tur === 'tatil' || o.tur === 'toren') && (o.bitis || o.tarih) >= bugun));
+  if (tatil.length) h += `<section class="bolum"><h2>Tatiller ve törenler</h2><div class="kart">${tatil.map(sinavSatiri).join('')}</div></section>`;
+  const gecmis = sinav.filter(o => o.tarih < bugun).reverse();
+  if (gecmis.length) h += `<details class="bolum gecmis"><summary>Geçmiş sınavlar (${gecmis.length})</summary><div class="kart">${gecmis.map(sinavSatiri).join('')}</div></details>`;
+  h += `<p class="ipucu">Kurul sınavlarının saati önce yaklaşık verilir, son hafta kesinleşir. Kesin saat duyurulunca burada görünür.</p>`;
+  return h;
+}
+
 function gorDegisen() {
   const liste = DEGISIM.filter(d => !d.program || d.program === durum.program);
   let h = '';
@@ -339,8 +430,8 @@ function ciz() {
   if (!durum.grup) { ust.innerHTML = ''; alt.hidden = true; ana.innerHTML = gorKarsilama(); bagla(); return; }
   alt.hidden = false;
   alt.querySelectorAll('button').forEach(b => b.dataset.sekme === durum.sekme ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
-  ust.innerHTML = durum.sekme === 'bugun' ? ustBugun() : `<div class="basrow"><div><h1 class="gunbas">${{ pratik: 'Pratiklerim', degisen: 'Değişenler', ben: 'Ben' }[durum.sekme]}</h1><div class="gunalt">${esc(PROGRAM_AD[durum.program] || '')}</div></div>${grupRozet()}</div>`;
-  ana.innerHTML = { bugun: gorBugun, pratik: gorPratik, degisen: gorDegisen, ben: gorBen }[durum.sekme]();
+  ust.innerHTML = durum.sekme === 'bugun' ? ustBugun() : `<div class="basrow"><div><h1 class="gunbas">${{ pratik: 'Pratiklerim', sinav: 'Sınavlar', degisen: 'Değişenler', ben: 'Ben' }[durum.sekme]}</h1><div class="gunalt">${esc(PROGRAM_AD[durum.program] || '')}</div></div>${grupRozet()}</div>`;
+  ana.innerHTML = { bugun: gorBugun, pratik: gorPratik, sinav: gorSinavlar, degisen: gorDegisen, ben: gorBen }[durum.sekme]();
   isaretleSimdi();
   bagla();
 }

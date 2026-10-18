@@ -1,0 +1,88 @@
+{
+ "_kaynak": "Ortak Dersler Sınav Tarihleri görseli (ortakdersler.iuc.edu.tr → Sınav Tarihleri → Cerrahpaşa Tıp Fakültesi). Görsel değişirse güncelleyici 'Ortak ders sınav tarihleri görseli değişti' kaydı düşer; bu dosya elle güncellenir.",
+ "sinavlar": [
+  {
+   "tarih": "2026-11-23",
+   "saat": "16:30",
+   "ders": "Atatürk İlkeleri ve İnkılâp Tarihi I",
+   "tur": "ara"
+  },
+  {
+   "tarih": "2026-11-24",
+   "saat": "16:30",
+   "ders": "Türk Dili I",
+   "tur": "ara"
+  },
+  {
+   "tarih": "2026-11-24",
+   "saat": "17:30",
+   "ders": "Yabancı Dil I",
+   "tur": "ara"
+  },
+  {
+   "tarih": "2027-01-11",
+   "saat": "09:30",
+   "ders": "Atatürk İlkeleri ve İnkılâp Tarihi I",
+   "tur": "final"
+  },
+  {
+   "tarih": "2027-01-11",
+   "saat": "10:30",
+   "ders": "Türk Dili I",
+   "tur": "final"
+  },
+  {
+   "tarih": "2027-01-11",
+   "saat": "11:30",
+   "ders": "Güzel Sanatlar I",
+   "tur": "final",
+   "secmeli": true
+  },
+  {
+   "tarih": "2027-01-12",
+   "saat": "13:30",
+   "ders": "Yabancı Dil I",
+   "tur": "final"
+  },
+  {
+   "tarih": "2027-01-12",
+   "saat": "14:30",
+   "ders": "Şehir-Kültür İstanbul",
+   "tur": "final",
+   "secmeli": true
+  },
+  {
+   "tarih": "2027-01-25",
+   "saat": "09:30",
+   "ders": "Atatürk İlkeleri ve İnkılâp Tarihi I",
+   "tur": "butunleme"
+  },
+  {
+   "tarih": "2027-01-25",
+   "saat": "10:30",
+   "ders": "Türk Dili I",
+   "tur": "butunleme"
+  },
+  {
+   "tarih": "2027-01-25",
+   "saat": "11:30",
+   "ders": "Yabancı Dil I",
+   "tur": "butunleme"
+  },
+  {
+   "tarih": "2027-01-26",
+   "saat": "09:30",
+   "ders": "Güzel Sanatlar I",
+   "tur": "butunleme",
+   "secmeli": true
+  },
+  {
+   "tarih": "2027-01-26",
+   "saat": "10:30",
+   "ders": "Şehir-Kültür İstanbul",
+   "tur": "butunleme",
+   "secmeli": true
+  }
+ ],
+ "gorsel_sha": "522b9bcbf36a40ab"
+}

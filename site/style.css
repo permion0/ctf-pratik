@@ -184,3 +184,14 @@ main { padding-block: 6px 24px; display: flex; flex-direction: column; gap: 18px
 .hak .say small { font-size: 13px; }
 @media (max-height: 700px) { .ust { position: static; } }
 @media (max-width: 360px) { .gunbas { font-size: 25px; } .app { padding-inline: 14px; } .durak { grid-template-columns: 46px 22px 1fr; column-gap: 8px; } .durak::before { left: 63px; } }
+
+/* sınavlar */
+.sinavkart { --hat: var(--uyari); position: relative; padding-right: 92px; }
+.sinavkart .sayac { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); text-align: center; font: 700 14px/1.1 var(--f-levha); color: var(--uyari); }
+.sinavkart .sayac b { display: block; font: 800 34px/1 var(--f-levha); font-variant-numeric: tabular-nums; }
+.satir.sinav { grid-template-columns: 70px 1fr; }
+.satir.sinav.gecti { opacity: .55; }
+.satir.sinav.ortak .ne b::after { content: ""; }
+.satir.sinav.tatil .tarih, .satir.sinav.toren .tarih { color: var(--soluk); }
+details.gecmis > summary { cursor: pointer; font: 700 16px var(--f-levha); color: var(--soluk); min-height: 44px; display: flex; align-items: center; }
+.gezinti button { font-size: 12px; }
