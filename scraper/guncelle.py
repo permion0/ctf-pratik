@@ -215,6 +215,14 @@ def duzeltme_farklari(eski, yeni):
     return out
 
 
+def deger_adi(v):
+    if not v or v == '-':
+        return 'pratik yok'
+    if re.fullmatch(r'\d[abc]?', v):
+        return f'grup {v}'
+    return v.capitalize() if v.isupper() else v
+
+
 def farklar(eski, yeni):
     """Pratik tablosundaki gün/ders/grup değişikliklerini tek tek yazar."""
     out = program_farklari(eski, yeni) + duzeltme_farklari(eski, yeni)
@@ -234,7 +242,7 @@ def farklar(eski, yeni):
     for anahtar in sorted(set(a) | set(b)):
         if a.get(anahtar) != b.get(anahtar) and anahtar[0] >= SIMDI.date().isoformat():
             out.append({'zaman': SIMDI.isoformat(), 'kaynak': 'Pratik dönüşüm tablosu', 'tarih': anahtar[0], 'ders': anahtar[1],
-                        'ne': f'{anahtar[1]}: {a.get(anahtar) or "—"} → {b.get(anahtar) or "—"}'})
+                        'ne': f'{anahtar[1]}: {deger_adi(a.get(anahtar))} → {deger_adi(b.get(anahtar))}'})
     return out
 
 
