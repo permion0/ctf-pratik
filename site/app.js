@@ -170,16 +170,16 @@ function durakPratik(p, gun) {
   const yer = p.yer || YER[p.ders] || '';
   const etiket = [
     `<span class="etiket hat">${p.altgrup ? 'Alt grup ' + esc(p.altgrup) : 'Grup ' + esc(p.grup || durum.grup)}</span>`,
-    kesin ? `<span class="etiket kesin">Saat kesin</span>` : `<span class="etiket belirsiz">Kesin saat henüz duyurulmadı</span>`,
+    kesin ? '' : `<span class="etiket belirsiz">Saat belli değil</span>`,
     p.sinav ? `<span class="etiket dikkat">Pratik sınavı</span>` : ''
   ].join('');
   return { bas, bit, html: `<li class="durak pratik ${p.iptal ? 'iptal' : ''}" style="--hat:${hat(p.ders)}" data-bas="${bas}" data-bit="${bit}">
-    <div class="saat">${kesin ? bas : vb}<small>${kesin ? (p.bit || 'başlar') : 've sonrası'}</small></div><div class="nokta"></div>
-    <div class="icerik"><div class="ders">${esc(p.ders)} pratiği${p.iptal ? ' · iptal' : ''}</div>
+    <div class="saat">${kesin ? bas : vb}<small>${kesin ? (p.bit || '') : ve}</small></div><div class="nokta"></div>
+    <div class="icerik"><div class="ders">${esc(p.ders)} pratiği${p.iptal ? ' (iptal)' : ''}</div>
     ${yer ? `<div class="alt">${esc(yer)}</div>` : ''}${p.not ? `<div class="alt">${esc(p.not)}</div>` : ''}
     <div class="etiketler">${etiket}</div>
-    ${p.istisna ? `<div class="alt" style="margin-top:8px">${esc(p.ders)} listesinde grubun <b>${esc(p.grup)}</b>; diğer derslerde ${esc(durum.grup)}.</div>` : ''}
-    <div class="kaynak">Kaynak: ${esc([p.kaynak, p.saatKaynak && p.saatKaynak !== p.kaynak ? 'saat: ' + p.saatKaynak : ''].filter(Boolean).join(', '))}</div></div></li>` };
+    ${p.istisna ? `<div class="alt" style="margin-top:8px">${esc(p.ders)} listesinde ${esc(p.grup)} grubundasın.</div>` : ''}
+    </div></div></li>` };
 }
 
 function gorBugun() {
@@ -195,14 +195,14 @@ function gorBugun() {
   let h = '';
   for (const o of ol) h += `<div class="serit" role="status">${esc(olayAdi(o.ad))}${o.dersler?.length && o.dersler.length < 4 ? ': ' + esc(o.dersler.join(', ')) : ''}</div>`;
   if (gun === iso(new Date())) h += siradaki(duraklar);
-  if (!VERI.programlar?.[durum.program]) h += `<div class="serit bilgi">Teorik ders programı henüz yüklenmedi; şimdilik sadece pratikler görünüyor.</div>`;
+  if (!VERI.programlar?.[durum.program]) h += `<div class="serit bilgi">Ders programı yüklenemedi, sadece pratikler gösteriliyor.</div>`;
   if (duraklar.length) h += `<ol class="guzergah">${duraklar.map(d => d.html).join('')}</ol>`;
-  else if (!ol.length) h += `<div class="bos"><b>${[0, 6].includes(tarihten(gun).getDay()) ? 'Hafta sonu' : 'Bu gün boş'}</b>Programda ders ya da pratik yok.</div>`;
-  h += `<p class="guncel">Kaynaklar son kontrol: ${zamanFark(KONTROL.zaman || VERI.guncelleme)}</p>`;
+  else if (!ol.length) h += `<div class="bos"><b>${[0, 6].includes(tarihten(gun).getDay()) ? 'Hafta sonu' : 'Ders yok'}</b></div>`;
+  h += `<p class="guncel">Son kontrol: ${zamanFark(KONTROL.zaman || VERI.guncelleme)}</p>`;
   return h;
 }
 function olayAdi(a) {
-  return a.replace(/ARASINAVI/, 'ara sınavı').replace(/BİTİRME SINAVI/, 'bitirme sınavı').replace(/DOĞAL AFET/, 'Pratik yok: doğal afet (yağmur) nedeniyle iptal').replace(/BAYRAMI/, 'Bayramı');
+  return a.replace(/ARASINAVI/, 'ara sınavı').replace(/BİTİRME SINAVI/, 'bitirme sınavı').replace(/DOĞAL AFET/, 'Pratik iptal (doğal afet)').replace(/BAYRAMI/, 'Bayramı').replace(/YILBAŞI/, 'Yılbaşı').replace(/BEYAZ ÖNLÜK TÖRENİ/, 'Beyaz önlük töreni');
 }
 function siradaki(duraklar) {
   const simdi = new Date(), m = simdi.getHours() * 60 + simdi.getMinutes();
@@ -212,7 +212,7 @@ function siradaki(duraklar) {
   const ders = el.querySelector('.ders')?.textContent || '', alt = el.querySelector('.alt')?.textContent || '';
   const hatRenk = el.firstElementChild.style.getPropertyValue('--hat');
   const fark = dk(su.bas) - m;
-  const ne = fark > 0 ? (fark < 60 ? `${fark} dakika sonra` : `${Math.floor(fark / 60)} saat ${fark % 60 ? (fark % 60) + ' dakika ' : ''}sonra`) : 'Şu an';
+  const ne = fark > 0 ? (fark < 60 ? `${fark} dk sonra` : `${Math.floor(fark / 60)} sa ${fark % 60 ? (fark % 60) + ' dk ' : ''}sonra`) : 'Şimdi';
   return `<section class="siradaki" style="--hat:${hatRenk}" aria-label="Sıradaki"><div class="ne">${ne}, ${su.bas}</div><div class="baslik">${esc(ders)}</div>${alt ? `<div class="ayrinti"><span>${esc(alt)}</span></div>` : ''}</section>`;
 }
 function zamanFark(isoz) {
@@ -242,7 +242,7 @@ function gorPratik() {
   }
   const kurullar = [...new Set(Object.keys(gruplu).map(k => k.split('|')[0]))];
   const aktif = kurullar.find(k => Object.entries(gruplu).some(([a, l]) => a.startsWith(k + '|') && l.some(p => p.tarih >= bugun))) || kurullar[kurullar.length - 1];
-  let h = `<p class="ipucu" style="margin:0">Okulun tablosundan ve bölüm listelerinden. Gitmediğin pratiği işaretle, kalan hakkını görürsün.</p>`;
+  let h = '';
   for (const kurul of kurullar.sort((a, b) => (a === aktif ? -1 : b === aktif ? 1 : a.localeCompare(b)))) {
     const satirlar = Object.entries(gruplu).filter(([a]) => a.startsWith(kurul + '|'));
     h += `<section class="bolum"><h2>${esc(kurul)} kurulu${kurul === aktif ? '' : ''}</h2>`;
@@ -252,47 +252,46 @@ function gorPratik() {
       const hak = hakHesap(gecerli.length);
       const kullanilan = gecerli.filter(p => durum.gitmedim[`${p.tarih}|${p.ders}`]).length;
       const kalan = hak - kullanilan;
-      h += `<div class="kart" style="--hat:${hat(ders)}"><div class="hak"><div class="say">${Math.max(kalan, 0)}<small>hak</small></div><div><b>${esc(ders)}</b><div class="ipucu">${gecerli.length} pratik, ${hak ? hak + ' devamsızlık hakkı' : 'devamsızlık hakkı yok'}${kalan < 0 ? '. Hakkını aştın, temsilciye sor' : ''}</div></div></div>
+      h += `<div class="kart" style="--hat:${hat(ders)}"><div class="hak"><div class="say">${Math.max(kalan, 0)}<small>hak</small></div><div><b>${esc(ders)}</b><div class="ipucu">${gecerli.length} pratik, ${hak ? hak + ' devamsızlık hakkı' : 'devamsızlık hakkı yok'}${kalan < 0 ? '. Hakkın bitti' : ''}</div></div></div>
       <div class="cubuk">${gecerli.map(p => `<i class="${durum.gitmedim[`${p.tarih}|${p.ders}`] ? 'gitmedi' : p.tarih < bugun ? 'gitti' : p.tarih === bugun ? 'bugun' : ''}"></i>`).join('')}</div>
-      <div style="margin-top:6px">${l.map(p => { const anahtar = `${p.tarih}|${p.ders}`; const [vb] = pratikSaati(p.tarih); return `<div class="satir"><div class="tarih">${tarihten(p.tarih).getDate()} ${AY_ADI[tarihten(p.tarih).getMonth()].slice(0, 3)}<small>${GUN_KISA[tarihten(p.tarih).getDay()]}</small></div><div class="ne"><b>${p.iptal ? 'İptal' : (p.bas ? (p.bit ? p.bas + '–' + p.bit : 'Başlangıç ' + p.bas) : vb + ' ve sonrası')}</b><span>${p.altgrup ? 'Alt grup ' + esc(p.altgrup) : 'Grup ' + esc(p.grup || durum.grup)}${p.sinav ? ', pratik sınavı' : ''}</span></div>${p.tarih <= bugun && !p.iptal ? `<button class="secim" data-gitmedim="${esc(anahtar)}" aria-pressed="${!!durum.gitmedim[anahtar]}">${durum.gitmedim[anahtar] ? 'Gitmedim' : 'Gittim'}</button>` : '<span></span>'}</div>`; }).join('')}</div></div>`;
+      <div style="margin-top:6px">${l.map(p => { const anahtar = `${p.tarih}|${p.ders}`; const [vb, ve] = pratikSaati(p.tarih); return `<div class="satir"><div class="tarih">${tarihten(p.tarih).getDate()} ${AY_ADI[tarihten(p.tarih).getMonth()].slice(0, 3)}<small>${GUN_KISA[tarihten(p.tarih).getDay()]}</small></div><div class="ne"><b>${p.iptal ? 'İptal' : (p.bas ? (p.bit ? p.bas + '–' + p.bit : p.bas) : vb + '–' + ve)}</b><span>${[p.altgrup ? 'Alt grup ' + esc(p.altgrup) : '', p.sinav ? 'Pratik sınavı' : ''].filter(Boolean).join(', ')}</span></div>${p.tarih <= bugun && !p.iptal ? `<button class="secim" data-gitmedim="${esc(anahtar)}" aria-pressed="${!!durum.gitmedim[anahtar]}">Gitmedim</button>` : '<span></span>'}</div>`; }).join('')}</div></div>`;
     }
     h += `</section>`;
   }
-  h += `<section class="bolum"><div class="kart ipucu">Kural (temsilcinin 8 Ekim duyurusu): bir derste 5 ya da daha fazla pratik varsa %80 devam zorunlu, 5'ten azsa 1 devamsızlık hakkı var, tek pratiği olan derse gitmek zorunlu. Ayrıca kuruldaki bütün pratiklerin %80'ine katılmalısın. Rapor devamsızlıktan sayılmaz; pratiğin asistanına iletilir.</div></section>`;
+  h += `<p class="ipucu">Devamsızlık: 5'ten az pratiği olan derste 1 hak, 5 ve fazlasında %20. Tek pratiği olan derse gitmek zorunlu. Raporlu gün devamsızlık sayılmaz.</p>`;
   return h;
 }
 
 function gorDegisen() {
   const liste = DEGISIM.filter(d => !d.program || d.program === durum.program);
-  let h = `<p class="ipucu" style="margin:0">Okulun tablolarında ve temsilcinin düzeltmelerinde yakalanan her değişiklik, en yenisi üstte.</p>`;
-  if (!liste.length) h += `<div class="kart bos"><b>Henüz değişiklik yok</b>Kaynaklar 15 dakikada bir kontrol ediliyor. Bir şey değişince burada görünür.</div>`;
-  else h += `<div class="kart">${liste.slice(0, 80).map(d => `<div class="degisim" style="--hat:${hat(d.ders || '')}"><i></i><div><div>${d.tarih ? '<b>' + esc(insanTarih(d.tarih)) + '</b>, ' : ''}${esc(d.ne)}</div><div class="zaman">${esc(zamanFark(d.zaman))} · ${esc(d.kaynak)}</div></div></div>`).join('')}</div>`;
-  h += `<section class="bolum"><h2>İzlenen kaynaklar</h2><div class="kart">${(VERI.kaynaklar || []).map(k => `<div class="satir iki"><div class="ne"><b>${esc(k.ad)}</b><span>Son değişiklik: ${esc(zamanFark(k.degisti))}</span></div>${k.url ? `<a href="${esc(k.url)}" target="_blank" rel="noopener">Kaynağı aç</a>` : '<span></span>'}</div>`).join('')}</div></section>`;
+  let h = '';
+  if (!liste.length) h += `<div class="kart bos"><b>Henüz değişiklik yok</b></div>`;
+  else h += `<div class="kart">${liste.slice(0, 80).map(d => `<div class="degisim" style="--hat:${hat(d.ders || '')}"><i></i><div><div>${d.tarih ? '<b>' + esc(insanTarih(d.tarih)) + '</b>, ' : ''}${esc(d.ne)}</div><div class="zaman">${esc(zamanFark(d.zaman))}, ${esc(d.kaynak)}</div></div></div>`).join('')}</div>`;
+  h += `<section class="bolum"><h2>Kaynaklar</h2><div class="kart">${(VERI.kaynaklar || []).map(k => `<div class="satir iki"><div class="ne"><b>${esc(k.ad)}</b><span>Son değişiklik: ${esc(zamanFark(k.degisti))}</span></div>${k.url ? `<a href="${esc(k.url)}" target="_blank" rel="noopener">Aç</a>` : '<span></span>'}</div>`).join('')}</div></section>`;
   return h;
 }
 
 function gorBen() {
   const takvim = durum.grup ? new URL(`data/takvim/${durum.program}-${durum.grup}.ics`, location.href).href : '';
-  return `<section class="bolum"><h2>Numaran ve grubun</h2>
+  return `<section class="bolum"><h2>Numaran</h2>
   <div class="kart" style="display:grid;gap:14px">${formNumara()}</div></section>
-  ${takvim ? `<section class="bolum"><h2>Telefonunun takvimine ekle</h2><p>Bir kez abone ol; program değişince takvimin de kendiliğinden güncellenir.</p><div class="kart" style="display:grid;gap:10px">
-  <a class="dugme" style="text-align:center;text-decoration:none" href="${esc(takvim.replace(/^https?:/, 'webcal:'))}">Takvime abone ol</a>
+  ${takvim ? `<section class="bolum"><h2>Takvime ekle</h2><p>Program değişince takvimin de güncellenir.</p><div class="kart" style="display:grid;gap:10px">
+  <a class="dugme" style="text-align:center;text-decoration:none" href="${esc(takvim.replace(/^https?:/, 'webcal:'))}">Takvime ekle</a>
   <div class="kopya"><input readonly value="${esc(takvim)}" aria-label="Takvim adresi"><button class="dugme ikincil" data-kopyala="${esc(takvim)}">Kopyala</button></div>
-  <div class="ipucu">Android'de Google Takvim: Ayarlar → Takvim ekle → URL ile, adresi yapıştır.</div></div></section>` : ''}
-  <section class="bolum"><h2>Bu site ne yapıyor?</h2><div class="kart ipucu">Okulun öğrenci portalındaki pratik dönüşüm tablosunu, Drive'daki ders programını, bölümlerin pratik listelerini ve temsilcinin düzeltmelerini 15 dakikada bir okur. Numaran bu telefonda kalır; sunucuya gönderilmez. Sitede öğrenci adı yoktur.</div></section>`;
+  <div class="ipucu">Android: Google Takvim → Ayarlar → Takvim ekle → URL ile.</div></div></section>` : ''}
+  <section class="bolum"><h2>Hakkında</h2><p>Okulun pratik tablosu, Drive'daki ders programı, bölüm listeleri ve temsilcinin düzeltmeleri 15 dakikada bir kontrol edilir. Numaran sadece bu telefonda kalır.</p></section>`;
 }
 function formNumara(ilk) {
   return `<form id="numform" class="alan" novalidate>
     <label for="no">Öğrenci numaran</label>
     <input id="no" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="0901260…" value="${esc(durum.numara)}">
-    <div class="ipucu">Grubun numarandan bulunur. Numara bu telefonda kalır.</div>
+    <div class="ipucu">Numaran sadece bu telefonda kalır.</div>
     <div class="hata" id="nohata" hidden></div>
-    ${durum.grup && !ilk ? `<div class="ipucu">Grubun: <b>${esc(durum.grup)}</b>. Bölüm listesinde başka bir alt gruptaysan Pratiklerim'de o görünür.</div>` : ''}
-    <button class="dugme" type="submit">${ilk ? 'Programımı göster' : 'Kaydet'}</button></form>`;
+    <button class="dugme" type="submit">${ilk ? 'Devam' : 'Kaydet'}</button></form>`;
 }
 function gorKarsilama() {
-  return `<div class="karsilama"><div><h1>Bugün nerede olman gerektiğini söyleyen sayfa</h1></div>
-  <p>Cerrahpaşa Tıp 1. sınıf: teorik dersler, pratik grubun, saatin ve yerin. Okulun tabloları değişince kendiliğinden güncellenir.</p>
+  return `<div class="karsilama"><div><h1>Ders ve pratik programın</h1></div>
+  <p>Cerrahpaşa Tıp 1. sınıf. Numaranı gir, grubunun programını gör.</p>
   <div class="kart" style="display:grid;gap:14px">${formNumara(true)}</div></div>`;
 }
 
@@ -302,7 +301,7 @@ function ciz() {
   if (!durum.grup) { ust.innerHTML = ''; alt.hidden = true; ana.innerHTML = gorKarsilama(); bagla(); return; }
   alt.hidden = false;
   alt.querySelectorAll('button').forEach(b => b.dataset.sekme === durum.sekme ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
-  ust.innerHTML = durum.sekme === 'bugun' ? ustBugun() : `<div class="basrow"><div><h1 class="gunbas">${{ pratik: 'Pratikler', degisen: 'Değişenler', ben: 'Ben' }[durum.sekme]}</h1><div class="gunalt">${esc(PROGRAM_AD[durum.program] || '')}</div></div>${grupRozet()}</div>`;
+  ust.innerHTML = durum.sekme === 'bugun' ? ustBugun() : `<div class="basrow"><div><h1 class="gunbas">${{ pratik: 'Pratiklerim', degisen: 'Değişenler', ben: 'Ben' }[durum.sekme]}</h1><div class="gunalt">${esc(PROGRAM_AD[durum.program] || '')}</div></div>${grupRozet()}</div>`;
   ana.innerHTML = { bugun: gorBugun, pratik: gorPratik, degisen: gorDegisen, ben: gorBen }[durum.sekme]();
   isaretleSimdi();
   bagla();
@@ -337,7 +336,7 @@ function bagla() {
     const hata = $('#nohata');
     if (no.length !== 10) { hata.hidden = false; hata.textContent = 'Numara 10 haneli olmalı.'; return; }
     const g = gruptan(no);
-    if (!g) { hata.hidden = false; hata.textContent = 'Bu numara 1. sınıf gruplarının hiçbirinde yok. Numarayı kontrol et.'; return; }
+    if (!g) { hata.hidden = false; hata.textContent = 'Bu numara 1. sınıf listesinde yok.'; return; }
     durum.numara = no; durum.grup = g;
     durum.program = no.startsWith('0902') ? 'EN' : 'TR';
     depo.koy('numara', no); depo.koy('grup', g); depo.koy('program', durum.program);

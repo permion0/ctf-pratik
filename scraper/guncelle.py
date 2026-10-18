@@ -86,8 +86,8 @@ def main():
     def kaynak_durumu(anahtar, ad, url, icerik_ozeti):
         k = durum['kaynaklar'].get(anahtar)
         if not k or k['ozet'] != icerik_ozeti:
-            if k:
-                yeni_kayit.append({'zaman': SIMDI.isoformat(), 'kaynak': ad, 'ne': f'{ad} güncellendi', 'url': url})
+            if k and anahtar == 'ortak_sinav':  # diğerlerinin ayrıntılı farkı ayrıca yazılıyor
+                yeni_kayit.append({'zaman': SIMDI.isoformat(), 'kaynak': ad, 'ne': 'Ortak ders sınav tarihleri görseli değişti', 'url': url})
             durum['kaynaklar'][anahtar] = {'ad': ad, 'url': url, 'ozet': icerik_ozeti, 'degisti': SIMDI.isoformat()}
         durum['kaynaklar'][anahtar]['url'] = url
 
