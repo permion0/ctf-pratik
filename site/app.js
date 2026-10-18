@@ -280,13 +280,13 @@ function gorPratik() {
   let h = '';
   for (const kurul of kurullar.sort((a, b) => (a === aktif ? -1 : b === aktif ? 1 : a.localeCompare(b)))) {
     const satirlar = Object.entries(gruplu).filter(([a]) => a.startsWith(kurul + '|'));
-    const kurulToplam = satirlar.reduce((t, [, l]) => t + l.filter(p => !p.iptal).length, 0);
+    const kurulToplam = satirlar.reduce((t, [, l]) => t + l.length, 0);  // iptal edilenin telafisi olacak, toplamda sayılır
     const kurulHak = Math.floor(kurulToplam / 5);  // kuruldaki bütün pratiklerin %80'ine katılmak gerekir
     const kurulKullanilan = satirlar.reduce((t, [, l]) => t + l.filter(p => !p.iptal && durum.gitmedim[`${p.tarih}|${p.ders}`]).length, 0);
     h += `<section class="bolum"><h2>${esc(kurul)} kurulu</h2><p>${kurulToplam} pratik, kurulda toplam ${kurulHak} devamsızlık hakkı${kurulKullanilan ? `, ${kurulKullanilan} kullandın, ${Math.max(kurulHak - kurulKullanilan, 0)} kaldı` : ''}.</p>`;
     for (const [a, l] of satirlar) {
       const ders = a.split('|')[1];
-      const gecerli = l.filter(p => !p.iptal);
+      const gecerli = l;  // iptaller de sayılır (telafi yapılacak)
       const hak = hakHesap(gecerli.length);
       const kullanilan = gecerli.filter(p => durum.gitmedim[`${p.tarih}|${p.ders}`]).length;
       const kalan = Math.min(hak - kullanilan, kurulHak - kurulKullanilan);
@@ -296,7 +296,7 @@ function gorPratik() {
     }
     h += `</section>`;
   }
-  h += `<p class="ipucu">Devamsızlık (temsilci): bir derste 5 ya da daha fazla pratik varsa %80 devam zorunlu, 5'ten azsa 1 hak var. Kuruldaki bütün pratiklerin de %80'ine katılmak gerekir. Tek pratiği olan derse gitmek zorunlu. Raporlu gün devamsızlıktan sayılmaz; rapor pratiğin asistanına verilir. Pratik sınavı olan ders kendi kuralını koyabilir.</p>`;
+  h += `<p class="ipucu">Devamsızlık (temsilci): bir derste 5 ya da daha fazla pratik varsa %80 devam zorunlu, 5'ten azsa 1 hak var. Kuruldaki bütün pratiklerin de %80'ine katılmak gerekir. İptal edilen pratiğin telafisi yapılır, toplamda sayılır. Tek pratiği olan derse gitmek zorunlu. Raporlu gün devamsızlıktan sayılmaz; rapor pratiğin asistanına verilir. Pratik sınavı olan ders kendi kuralını koyabilir.</p>`;
   return h;
 }
 
