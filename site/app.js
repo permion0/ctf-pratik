@@ -120,12 +120,12 @@ function pratikler(gun) {
         const g = p.grup || durum.grup;
         const once = siraKimde(k, sira);
         p.bas = once === 'birlikte' ? k.saatler[0] : k.saatler[g.slice(1) === once ? 0 : 1];
-        p.bit = saatEkle(p.bas, k.sure || 60);
+        p.bit = saatEkle(p.bas, k.sure || 60); p.bitTahmini = true;
         p.tahmini = true;
         p.siraNotu = once === 'birlikte' ? 'İki grup birlikte girer' : `Bu sefer önce ${g[0]}${once} girer`;
       }
     } else if (k.sira === 'liste') { p.listeBekleniyor = true;
-    } else if (k.bas || k.saatler) { p.bas = k.bas || k.saatler[0]; p.bit = saatEkle(p.bas, k.sure || 60); p.tahmini = !(k.dogrulanan || []).includes(gun); }
+    } else if (k.bas || k.saatler) { p.bas = k.bas || k.saatler[0]; p.bit = saatEkle(p.bas, k.sure || 60); p.bitTahmini = true; p.tahmini = !(k.dogrulanan || []).includes(gun); }
   }
   for (const p of out) { const tn = kural(p.ders).tarih_notlari?.[gun]; if (tn) p.tarihNotu = tn; }
   // temsilci düzeltmeleri
@@ -137,7 +137,7 @@ function pratikler(gun) {
     if (d.grup !== 'hepsi' && d.grup !== dg && d.grup !== dg[0]) continue;
     if (!p && (d.durum === 'ek' || d.durum === 'değişti')) { p = { ders: d.ders, kaynak: 'Temsilci' }; out.push(p); }
     if (!p) continue;
-    if (d.bas) { p.bas = d.bas; p.bit = d.bit || saatEkle(d.bas, kural(p.ders).sure || 60); p.saatKaynak = 'Temsilci'; p.tahmini = false; p.siraNotu = ''; }
+    if (d.bas) { p.bas = d.bas; p.bit = d.bit || saatEkle(d.bas, kural(p.ders).sure || 60); p.bitTahmini = !d.bit; p.saatKaynak = 'Temsilci'; p.tahmini = false; p.siraNotu = ''; }
     if (d.yer) p.yer = d.yer;
     if (d.durum === 'iptal') p.iptal = true;
     if (d.not) p.not = d.not;
@@ -212,7 +212,7 @@ function durakPratik(p, gun) {
     p.sinav ? `<span class="etiket dikkat">Pratik sınavı</span>` : ''
   ].join('');
   return { bas, bit, html: `<li class="durak pratik ${p.iptal ? 'iptal' : ''}" style="--hat:${hat(p.ders)}" data-bas="${bas}" data-bit="${bit}">
-    <div class="saat">${kesin ? bas : vb}<small>${kesin ? (p.tahmini ? '' : (p.bit || '')) : ve}</small></div><div class="nokta"></div>
+    <div class="saat">${kesin ? bas : vb}<small>${kesin ? (p.bitTahmini ? '' : (p.bit || '')) : ve}</small></div><div class="nokta"></div>
     <div class="icerik"><div class="ders">${esc(p.ders)} pratiği${p.iptal ? ' (iptal)' : ''}</div>
     ${yer ? `<div class="alt">${esc(yer)}</div>` : ''}${p.not ? `<div class="alt">${esc(p.not)}</div>` : ''}
     <div class="etiketler">${etiket}</div>
@@ -292,7 +292,7 @@ function gorPratik() {
       const kalan = Math.min(hak - kullanilan, kurulHak - kurulKullanilan);
       h += `<div class="kart" style="--hat:${hat(ders)}"><div class="hak"><div class="say">${Math.max(kalan, 0)}<small>hak</small></div><div><b>${esc(ders)}</b><div class="ipucu">${gecerli.length} pratik, ${hak ? 'bu derste en fazla ' + hak + ' hak' : 'hak yok, gitmek zorunlu'}${kalan < 0 ? '. Hakkın bitti' : ''}</div></div></div>
       <div class="cubuk">${gecerli.map(p => `<i class="${durum.gitmedim[`${p.tarih}|${p.ders}`] ? 'gitmedi' : p.tarih < bugun ? 'gitti' : p.tarih === bugun ? 'bugun' : ''}"></i>`).join('')}</div>
-      <div style="margin-top:6px">${l.map(p => { const anahtar = `${p.tarih}|${p.ders}`; const [vb, ve] = pratikSaati(p.tarih); return `<div class="satir"><div class="tarih">${tarihten(p.tarih).getDate()} ${AY_ADI[tarihten(p.tarih).getMonth()].slice(0, 3)}<small>${GUN_KISA[tarihten(p.tarih).getDay()]}</small></div><div class="ne"><b>${p.iptal ? 'İptal' : (p.bas ? (p.bit && !p.tahmini ? p.bas + '–' + p.bit : p.bas + (p.tahmini ? ' (tahmini)' : '')) : vb + '–' + ve)}</b><span>${[p.altgrup ? 'Alt grup ' + esc(p.altgrup) : '', p.sinav ? 'Pratik sınavı' : ''].filter(Boolean).join(', ')}</span></div>${p.tarih <= bugun && !p.iptal ? `<button class="secim" data-gitmedim="${esc(anahtar)}" aria-pressed="${!!durum.gitmedim[anahtar]}">Gitmedim</button>` : '<span></span>'}</div>`; }).join('')}</div></div>`;
+      <div style="margin-top:6px">${l.map(p => { const anahtar = `${p.tarih}|${p.ders}`; const [vb, ve] = pratikSaati(p.tarih); return `<div class="satir"><div class="tarih">${tarihten(p.tarih).getDate()} ${AY_ADI[tarihten(p.tarih).getMonth()].slice(0, 3)}<small>${GUN_KISA[tarihten(p.tarih).getDay()]}</small></div><div class="ne"><b>${p.iptal ? 'İptal' : (p.bas ? (p.bit && !p.bitTahmini ? p.bas + '–' + p.bit : p.bas + (p.tahmini ? ' (tahmini)' : '')) : vb + '–' + ve)}</b><span>${[p.altgrup ? 'Alt grup ' + esc(p.altgrup) : '', p.sinav ? 'Pratik sınavı' : ''].filter(Boolean).join(', ')}</span></div>${p.tarih <= bugun && !p.iptal ? `<button class="secim" data-gitmedim="${esc(anahtar)}" aria-pressed="${!!durum.gitmedim[anahtar]}">Gitmedim</button>` : '<span></span>'}</div>`; }).join('')}</div></div>`;
     }
     h += `</section>`;
   }
