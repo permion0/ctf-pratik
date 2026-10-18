@@ -173,3 +173,14 @@ main { padding-block: 6px 24px; display: flex; flex-direction: column; gap: 18px
   .durak.simdi .nokta { animation: nabiz 2.4s ease-out infinite; }
   @keyframes nabiz { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--hat) 55%, transparent); } 70%, 100% { box-shadow: 0 0 0 10px transparent; } }
 }
+
+/* dokunma alanları (en az 44px) ve küçük ekranlar */
+.grupbadge { min-height: 44px; align-items: center; }
+.secim { min-height: 44px; min-width: 88px; padding: 6px 14px; }
+.satir.iki a { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 10px; }
+.gezinti button { min-height: 52px; }
+.hafta .ok { min-height: 44px; }
+.guncel, .ipucu { font-size: 13.5px; }
+.hak .say small { font-size: 13px; }
+@media (max-height: 700px) { .ust { position: static; } }
+@media (max-width: 360px) { .gunbas { font-size: 25px; } .app { padding-inline: 14px; } .durak { grid-template-columns: 46px 22px 1fr; column-gap: 8px; } .durak::before { left: 63px; } }

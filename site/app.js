@@ -387,7 +387,7 @@ $('#alt').addEventListener('click', e => { const b = e.target.closest('[data-sek
 
 async function yukle() {
   const al = async (y, d) => { try { const r = await fetch(y, { cache: 'no-cache' }); return r.ok ? r.json() : d; } catch { return d; } };
-  [VERI, LISTE, DEGISIM, KONTROL] = await Promise.all([al('data/veri.json', {}), al('data/liste.json', { numara: {}, oturumlar: [] }), al('data/degisiklikler.json', []), al('data/kontrol.json', {})]);
+  [VERI, LISTE, DEGISIM] = await Promise.all([al('data/veri.json', {}), al('data/liste.json', { numara: {}, oturumlar: [] }), al('data/degisiklikler.json', [])]);
   const bugun = new Date();
   const gun = [0, 6].includes(bugun.getDay()) ? ekle(pazartesi(bugun), 7) : bugun; // hafta sonu: gelecek pazartesi
   durum.gun = durum.gun || iso(gun);
