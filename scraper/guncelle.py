@@ -179,7 +179,7 @@ def main():
         sorunlar = []
     if os.path.exists(zorla):
         os.remove(zorla)
-    saglik = {'durum': 'durduruldu' if sorunlar else 'ok', 'sorunlar': sorunlar, 'uyarilar': capraz_kontrol(veri), 'hatalar': hatalar}
+    saglik = {'durum': 'durduruldu' if sorunlar else 'ok', 'sorunlar': sorunlar, 'uyarilar': capraz_kontrol(veri, durum.get('program_url')), 'hatalar': hatalar}
     eski_saglik = oku_json(os.path.join(DATA, 'saglik.json'), {})
     if {k: v for k, v in eski_saglik.items() if k != 'zaman'} != saglik:
         saglik['zaman'] = SIMDI.isoformat()
@@ -249,9 +249,15 @@ def duzeltme_farklari(eski, yeni):
     return out
 
 
-def capraz_kontrol(veri):
+PROGRAM_ID = '1LahYrgkKN5aXe4nmUGCimOFnNf7MluHSqLmjdy92VM0'  # köprünün okuduğu Drive dosyası
+
+
+def capraz_kontrol(veri, program_url=None):
     """İki kaynağın birbirini doğrulaması: okul PDF'indeki sınav günleri ile Drive programındaki sınav günleri."""
     uyarilar = []
+    if program_url and PROGRAM_ID not in program_url:
+        uyarilar.append(f'Okul sitesindeki ders programı linki artık başka bir Drive dosyasını gösteriyor: {program_url}. '
+                        'Köprü eski dosyayı okuyor; köprüdeki PROGRAM_ID güncellenmeli.')
     tr = ((veri.get('programlar') or {}).get('TR') or {}).get('onemli', [])
     prog_sinav = {o['tarih'] for o in tr if o['tur'] in ('ara', 'final', 'sinav')}
     pdf_sinav = {}
@@ -280,6 +286,9 @@ def koruma(eski, yeni):
             sorun.append(f'{kurul} kurulu pratik tablosundan okunamadı.')
         elif yk[kurul] < n * 0.8:
             sorun.append(f'{kurul} kurulunun pratik günleri {n} → {yk[kurul]} azaldı.')
+    for kod, yp in (yeni.get('programlar') or {}).items():
+        for y in yp.get('yapi') or []:
+            sorun.append(f'{kod} programı biçimi değişmiş olabilir: {y}')
     for kod, ep in (eski.get('programlar') or {}).items():
         yp = (yeni.get('programlar') or {}).get(kod)
         if not yp:

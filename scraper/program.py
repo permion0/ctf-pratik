@@ -10,8 +10,12 @@ AY = {'ocak': 1, 'şubat': 2, 'mart': 3, 'nisan': 4, 'mayıs': 5, 'haziran': 6, 
       'eylül': 9, 'ekim': 10, 'kasım': 11, 'aralık': 12,
       'january': 1, 'february': 2, 'march': 3, 'april': 4, 'may': 5, 'june': 6, 'july': 7, 'august': 8,
       'september': 9, 'october': 10, 'november': 11, 'december': 12}
-TARIH = re.compile(r'^\s*(\d{1,2})\s+([A-Za-zÇĞİÖŞÜçğıöşü]+)\s+(\d{4})')
-SAAT = re.compile(r'(\d{1,2})[.:](\d{2})\s*-\s*(\d{1,2})[.:](\d{2})')
+TARIH = re.compile(r'^\s*(\d{1,2})\s*([A-Za-zÇĞİÖŞÜçğıöşü]+)\s+(\d{4})')
+TARIH_SAYI = re.compile(r'^\s*(\d{1,2})[./](\d{1,2})[./](20\d\d)\b')   # "14.09.2026 Pazartesi" yazımına da hazır
+SAAT = re.compile(r'(\d{1,2})[.:](\d{2})\s*[-–—]\s*(\d{1,2})[.:](\d{2})')   # kısa, uzun ya da em tire
+# hafta başlığı satırındaki sütun adları (Türkçe ve İngilizce sekmeler)
+SUTUN_ADI = {'ders': re.compile(r'ders\s*ad|lecture|course', re.I), 'abd': re.compile(r'bilim\s*dal|department', re.I),
+             'hoca': re.compile(r'öğretim|ogretim|lecturer|instructor', re.I), 'yer': re.compile(r'derslik|hall|room|salon', re.I)}
 KURUL = re.compile(r'(\d\.\d)\s*(?:DERS KURULU|:)|COURSE\s+(\d\.\d)', re.I)
 PROGRAMLAR = {'1-TR': 'TR', '1- EN': 'EN', '1-EN': 'EN', '1- MT': 'MT', '1-MT': 'MT'}
 
@@ -21,6 +25,9 @@ def kucuk(s):
 
 
 def tarih(s):
+    n = TARIH_SAYI.match(s or '')
+    if n:
+        return f'{int(n.group(3)):04d}-{int(n.group(2)):02d}-{int(n.group(1)):02d}'
     m = TARIH.match(s or '')
     if not m:
         return None
@@ -45,6 +52,8 @@ def sekme(satirlar):
     gunler = {}      # tarih → [ders]
     kurullar = []    # [{kod, ad, bas}]
     gun_sutun = []   # [(tarih, sütun)]
+    harita = {}      # gün başlangıç sütunu → {'ders': i, 'abd': i, 'hoca': i, 'yer': i} (başlık satırından)
+    yapi = []        # biçim sorunları: varsa yayın durdurulur
     saat = None
     for satir in satirlar:
         satir = [c.strip() if isinstance(c, str) else '' for c in satir]
@@ -60,7 +69,21 @@ def sekme(satirlar):
             if kurullar and 'bas' not in kurullar[-1]:
                 kurullar[-1]['bas'] = tarihler[0][0]
             continue
-        if not gun_sutun or kucuk(ilk) in ('saat', 'hour'):
+        if not gun_sutun:
+            continue
+        if kucuk(ilk) in ('saat', 'hour', 'time'):
+            # sütun sırasını varsayma: başlıktan oku ("Ders Adı | Ana Bilim Dalı | Öğretim Üyesi | Derslik")
+            harita = {}
+            for t, s0 in gun_sutun:
+                bolge = {i: satir[i] for i in range(s0, min(s0 + 5, len(satir)))}
+                h = {}
+                for alan, rx in SUTUN_ADI.items():
+                    bul = [i for i, c in bolge.items() if rx.search(c)]
+                    if bul:
+                        h[alan] = bul[0]
+                if 'ders' not in h or len(h) < 3:
+                    yapi.append(f'{t} haftasının başlık satırı tanınmadı: {" | ".join(bolge.values())[:80]}')
+                harita[s0] = h
             continue
         sm = SAAT.search(ilk)
         if sm:
@@ -68,10 +91,12 @@ def sekme(satirlar):
         if not saat:
             continue
         for t, s in gun_sutun:
-            ders = satir[s] if s < len(satir) else ''
+            h = harita.get(s) or {'ders': s, 'abd': s + 1, 'hoca': s + 2, 'yer': s + 3}
+            al = lambda alan: satir[h[alan]] if alan in h and h[alan] < len(satir) else ''
+            ders = al('ders') or (satir[s] if s < len(satir) else '')  # birleşik hücre metni günün ilk sütununda durur
             if not ders:
                 continue
-            abd, hoca, yer = (satir[s + k] if s + k < len(satir) else '' for k in (1, 2, 3))
+            abd, hoca, yer = al('abd'), al('hoca'), al('yer')
             kayit = {'bas': saat[0], 'bit': saat[1], 'ders': re.sub(r'\s+', ' ', ders), 'abd': abd, 'hoca': hoca,
                      'yer': yer, 'tur': tur(ders, abd)}
             liste = gunler.setdefault(t, [])
@@ -80,13 +105,18 @@ def sekme(satirlar):
                 liste.append(kayit)
     for t in gunler:
         gunler[t].sort(key=lambda x: x['bas'])
-    return {'gunler': gunler, 'kurullar': kurullar}
+    if not gunler:
+        yapi.append('Sekmeden hiç ders okunamadı.')
+    return {'gunler': gunler, 'kurullar': kurullar, 'yapi': sorted(set(yapi))[:10]}
 
 
 def oku(program):
     out = {}
     for ad, satirlar in program.items():
         kod = PROGRAMLAR.get(ad.strip()) or PROGRAMLAR.get(re.sub(r'\s+', '', ad))
+        if not kod:  # sekme adı değişirse ("1. Sınıf TR" gibi) yine tanı
+            m = re.match(r'^\s*1\b.*?\b(TR|EN|MT)\b', ad, re.I)
+            kod = m.group(1).upper() if m else None
         if kod:
             out[kod] = sekme(satirlar)
             out[kod]['onemli'] = onemli_tarihler(satirlar)
