@@ -202,3 +202,20 @@ details.gecmis > summary { cursor: pointer; font: 700 16px var(--f-levha); color
 .ikili-sec button[aria-selected="true"] { background: var(--kagit); color: var(--murekkep); box-shadow: var(--golge); }
 .tatilkart { --hat: var(--vurgu); }
 .tatilkart .sayac { color: var(--vurgu); }
+
+/* bugüne dön, grup rozeti oku, sıradaki işareti, tahmini yazısı, kurul aç-kapa */
+.sagust { display: flex; align-items: center; gap: 8px; flex: none; }
+.bugune { min-height: 44px; border: 1.5px solid var(--vurgu); background: var(--vurgu-ac); color: var(--vurgu); border-radius: 10px; padding: 0 12px; font: 700 14px var(--f-govde); }
+.grupbadge svg { width: 16px; height: 16px; fill: none; stroke: var(--soluk); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; margin-left: -2px; align-self: center; }
+.sonraki-etiket { display: inline-block; margin-bottom: 4px; font: 700 12.5px var(--f-govde); color: #fff; background: var(--hat, var(--vurgu)); border-radius: 999px; padding: 2px 9px; }
+@media (prefers-color-scheme: dark) { .sonraki-etiket { color: #0E1820; } }
+.saat small.tahmini-yazi { color: var(--uyari); font-weight: 700; }
+details.kurul > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
+details.kurul > summary::-webkit-details-marker { display: none; }
+details.kurul > summary::after { content: ""; width: 9px; height: 9px; border-right: 2px solid var(--soluk); border-bottom: 2px solid var(--soluk); transform: rotate(45deg); margin-right: 6px; transition: transform .15s; }
+details.kurul[open] > summary::after { transform: rotate(-135deg); }
+details.kurul h2 small { font: 500 13px var(--f-govde); color: var(--soluk); margin-left: 6px; }
+details.kurul { display: grid; gap: 10px; }
+.basrow { flex-wrap: wrap; row-gap: 8px; }
+.basrow > div:first-child { min-width: 0; }
+@media (max-width: 360px) { .sagust { margin-left: auto; } .bugune { padding: 0 10px; font-size: 13.5px; } }

@@ -193,11 +193,14 @@ function ustBugun() {
     gunler += `<button class="gun ${s === bugun ? 'bugun' : ''}" aria-pressed="${s === durum.gun}" data-gun="${s}" aria-label="${insanTarih(s)}"><span class="ad">${GUN_KISA[x.getDay()]}</span><span class="no">${x.getDate()}</span><span class="imler">${im}</span></button>`;
   }
   const baslik = durum.gun === bugun ? 'Bugün' : durum.gun === iso(ekle(new Date(), 1)) ? 'Yarın' : GUN_ADI[d.getDay()];
-  return `<div class="basrow"><div><h1 class="gunbas">${baslik}</h1><div class="gunalt">${d.getDate()} ${AY_ADI[d.getMonth()]}${baslik === GUN_ADI[d.getDay()] ? '' : ', ' + GUN_ADI[d.getDay()]}</div></div>${grupRozet()}</div>
+  const donus = durum.gun !== varsayilanGun() ? `<button class="bugune" data-bugune="1">Bugüne dön</button>` : '';
+  return `<div class="basrow"><div><h1 class="gunbas">${baslik}</h1><div class="gunalt">${d.getDate()} ${AY_ADI[d.getMonth()]}${baslik === GUN_ADI[d.getDay()] ? '' : ', ' + GUN_ADI[d.getDay()]}</div></div><div class="sagust">${donus}${grupRozet()}</div></div>
   <div class="hafta"><button class="ok" data-hafta="-7" aria-label="Önceki hafta">‹</button>${gunler}<button class="ok" data-hafta="7" aria-label="Sonraki hafta">›</button></div>`;
 }
+/* hafta içi bugün; hafta sonu gelecek pazartesi */
+function varsayilanGun() { const b = new Date(); return iso([0, 6].includes(b.getDay()) ? ekle(pazartesi(b), 7) : b); }
 function grupRozet() {
-  return durum.grup ? `<button class="grupbadge" data-git="ben" aria-label="Grubun ${durum.grup}, değiştir"><span>Grup</span><b>${esc(durum.grup)}</b></button>` : '';
+  return durum.grup ? `<button class="grupbadge" data-git="ben" aria-label="Grubun ${durum.grup}. Değiştirmek için dokun" title="Grubunu değiştir"><span>Grup</span><b>${esc(durum.grup)}</b><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>` : '';
 }
 
 function durakPratik(p, gun) {
@@ -208,12 +211,12 @@ function durakPratik(p, gun) {
   const yer = p.yer || k.yer || '';
   const etiket = [
     `<span class="etiket hat">${p.altgrup ? 'Alt grup ' + esc(p.altgrup) : 'Grup ' + esc(p.grup || durum.grup)}</span>`,
-    !kesin ? `<span class="etiket belirsiz">${p.listeBekleniyor ? 'Liste bekleniyor' : 'Saat belli değil'}</span>` : p.tahmini ? `<span class="etiket belirsiz">Tahmini saat</span>` : '',
+    !kesin ? `<span class="etiket belirsiz">${p.listeBekleniyor ? 'Liste bekleniyor' : 'Saat belli değil'}</span>` : '',
     k.onluk ? `<span class="etiket">${esc(k.onluk)}</span>` : '',
     p.sinav ? `<span class="etiket dikkat">Pratik sınavı</span>` : ''
   ].join('');
-  return { bas, bit, html: `<li class="durak pratik ${p.iptal ? 'iptal' : ''}" style="--hat:${hat(p.ders)}" data-bas="${bas}" data-bit="${bit}">
-    <div class="saat">${kesin ? bas : vb}<small>${kesin ? (p.bitTahmini ? '' : (p.bit || '')) : ve}</small></div><div class="nokta"></div>
+  return { bas, bit, tahmini: kesin && p.tahmini && !p.iptal, html: `<li class="durak pratik ${p.iptal ? 'iptal' : ''}" style="--hat:${hat(p.ders)}" data-bas="${bas}" data-bit="${bit}">
+    <div class="saat">${kesin ? bas : vb}<small${kesin && p.tahmini ? ' class="tahmini-yazi"' : ''}>${kesin ? (p.tahmini ? 'tahmini' : (p.bitTahmini ? '' : (p.bit || ''))) : ve}</small></div><div class="nokta"></div>
     <div class="icerik"><div class="ders">${esc(p.ders)} pratiği${p.iptal ? ' (iptal)' : ''}</div>
     ${yer ? `<div class="alt">${esc(yer)}</div>` : ''}${p.not ? `<div class="alt">${esc(p.not)}</div>` : ''}
     <div class="etiketler">${etiket}</div>
@@ -235,10 +238,10 @@ function gorBugun() {
   const gunSinav = sinavlar().filter(o => o.tarih === gun);
   for (const o of gunSinav) h += `<div class="serit${o.tur === 'tatil' || o.tur === 'toren' ? ' bilgi' : ''}" role="status">${esc(o.baslik)}${o.saat ? ', ' + esc(o.saat) : (o.tur === 'tatil' || o.tur === 'toren' ? '' : ', saat henüz duyurulmadı')}</div>`;
   for (const o of ol.filter(o => !(gunSinav.length && /SINAV|BAYRAM|TÖREN|YILBAŞI/.test(o.ad)))) h += `<div class="serit" role="status">${esc(olayAdi(o.ad))}${o.dersler?.length && o.dersler.length < 4 ? ': ' + esc(o.dersler.join(', ')) : ''}</div>`;
-  if (gun === iso(new Date())) h += siradaki(duraklar);
   if (!VERI.programlar?.[durum.program]) h += `<div class="serit bilgi">Ders programı yüklenemedi, sadece pratikler gösteriliyor.</div>`;
   if (duraklar.length) h += `<ol class="guzergah">${duraklar.map(d => d.html).join('')}</ol>`;
   else if (!ol.length) h += `<div class="bos"><b>${[0, 6].includes(tarihten(gun).getDay()) ? 'Hafta sonu' : 'Ders yok'}</b></div>`;
+  if (duraklar.some(d => d.tahmini)) h += `<p class="ipucu">"Tahmini" yazan saatler önceki pratiklerin sırasına göre hesaplandı; kesin saat duyurulunca değişir.</p>`;
   h += `<p class="guncel">Program son değişti: ${zamanFark(VERI.guncelleme)}</p>`;
   return h;
 }
@@ -281,12 +284,13 @@ function gorPratik() {
   const kurullar = [...new Set(Object.keys(gruplu).map(k => k.split('|')[0]))];
   const aktif = kurullar.find(k => Object.entries(gruplu).some(([a, l]) => a.startsWith(k + '|') && l.some(p => p.tarih >= bugun))) || kurullar[kurullar.length - 1];
   let h = '';
-  for (const kurul of kurullar.sort((a, b) => (a === aktif ? -1 : b === aktif ? 1 : a.localeCompare(b)))) {
+  for (const kurul of kurullar.sort((a, b) => (a === aktif ? -1 : b === aktif ? 1 : (b > aktif) - (a > aktif) || a.localeCompare(b)))) {
     const satirlar = Object.entries(gruplu).filter(([a]) => a.startsWith(kurul + '|'));
     const kurulToplam = satirlar.reduce((t, [, l]) => t + l.length, 0);  // iptal edilenin telafisi olacak, toplamda sayılır
     const kurulHak = Math.floor(kurulToplam / 5);  // kuruldaki bütün pratiklerin %80'ine katılmak gerekir
     const kurulKullanilan = satirlar.reduce((t, [, l]) => t + l.filter(p => !p.iptal && durum.gitmedim[`${p.tarih}|${p.ders}`]).length, 0);
-    h += `<section class="bolum"><h2>${esc(kurul)} kurulu</h2><p>${kurulToplam} pratik, kurulda toplam ${kurulHak} devamsızlık hakkı${kurulKullanilan ? `, ${kurulKullanilan} kullandın, ${Math.max(kurulHak - kurulKullanilan, 0)} kaldı` : ''}.</p>`;
+    const kurulBitti = satirlar.every(([, l]) => l.every(p => p.tarih < bugun));
+    h += `<details class="bolum kurul" ${kurul === aktif ? 'open' : ''}><summary><h2>${esc(kurul)} kurulu${kurul === aktif ? '' : kurulBitti ? ' <small>bitti</small>' : ' <small>yaklaşan</small>'}</h2></summary><p>${kurulToplam} pratik, kurulda toplam ${kurulHak} devamsızlık hakkı${kurulKullanilan ? `, ${kurulKullanilan} kullandın, ${Math.max(kurulHak - kurulKullanilan, 0)} kaldı` : ''}.</p>`;
     for (const [a, l] of satirlar) {
       const ders = a.split('|')[1];
       const gecerli = l;  // iptaller de sayılır (telafi yapılacak)
@@ -295,9 +299,9 @@ function gorPratik() {
       const kalan = Math.min(hak - kullanilan, kurulHak - kurulKullanilan);
       h += `<div class="kart" style="--hat:${hat(ders)}"><div class="hak"><div class="say">${Math.max(kalan, 0)}<small>hak</small></div><div><b>${esc(ders)}</b><div class="ipucu">${gecerli.length} pratik, ${hak ? 'bu derste en fazla ' + hak + ' hak' : 'hak yok, gitmek zorunlu'}${kalan < 0 ? '. Hakkın bitti' : ''}</div></div></div>
       <div class="cubuk">${gecerli.map(p => `<i class="${durum.gitmedim[`${p.tarih}|${p.ders}`] ? 'gitmedi' : p.tarih < bugun ? 'gitti' : p.tarih === bugun ? 'bugun' : ''}"></i>`).join('')}</div>
-      <div style="margin-top:6px">${l.map(p => { const anahtar = `${p.tarih}|${p.ders}`; const [vb, ve] = pratikSaati(p.tarih); return `<div class="satir"><div class="tarih">${tarihten(p.tarih).getDate()} ${AY_ADI[tarihten(p.tarih).getMonth()].slice(0, 3)}<small>${GUN_KISA[tarihten(p.tarih).getDay()]}</small></div><div class="ne"><b>${p.iptal ? 'İptal' : (p.bas ? (p.bit && !p.bitTahmini ? p.bas + '–' + p.bit : p.bas + (p.tahmini ? ' (tahmini)' : '')) : vb + '–' + ve)}</b><span>${[p.altgrup ? 'Alt grup ' + esc(p.altgrup) : '', p.sinav ? 'Pratik sınavı' : ''].filter(Boolean).join(', ')}</span></div>${p.tarih <= bugun && !p.iptal ? `<button class="secim" data-gitmedim="${esc(anahtar)}" aria-pressed="${!!durum.gitmedim[anahtar]}">Gitmedim</button>` : '<span></span>'}</div>`; }).join('')}</div></div>`;
+      <div style="margin-top:6px">${l.map(p => { const anahtar = `${p.tarih}|${p.ders}`; const [vb, ve] = pratikSaati(p.tarih); return `<div class="satir"><div class="tarih">${tarihten(p.tarih).getDate()} ${AY_ADI[tarihten(p.tarih).getMonth()].slice(0, 3)}<small>${GUN_KISA[tarihten(p.tarih).getDay()]}</small></div><div class="ne"><b>${p.iptal ? 'İptal' : (p.bas ? (p.bit && !p.bitTahmini ? p.bas + '–' + p.bit : p.bas + (p.tahmini ? ', tahmini' : '')) : vb + '–' + ve)}</b><span>${[p.altgrup ? 'Alt grup ' + esc(p.altgrup) : '', p.sinav ? 'Pratik sınavı' : ''].filter(Boolean).join(', ')}</span></div>${p.tarih <= bugun && !p.iptal ? `<button class="secim" data-gitmedim="${esc(anahtar)}" aria-pressed="${!!durum.gitmedim[anahtar]}">Gitmedim</button>` : '<span></span>'}</div>`; }).join('')}</div></div>`;
     }
-    h += `</section>`;
+    h += `</details>`;
   }
   h += `<p class="ipucu">Devamsızlık (temsilci): bir derste 5 ya da daha fazla pratik varsa %80 devam zorunlu, 5'ten azsa 1 hak var. Kuruldaki bütün pratiklerin de %80'ine katılmak gerekir. İptal edilen pratiğin telafisi yapılır, toplamda sayılır. Tek pratiği olan derse gitmek zorunlu. Raporlu gün devamsızlıktan sayılmaz; rapor pratiğin asistanına verilir. Pratik sınavı olan ders kendi kuralını koyabilir.</p>`;
   return h;
@@ -386,10 +390,12 @@ function gorSinavlar() {
   };
   if (gorunum === 'sinav') {
     const sinav = tum.filter(o => o.tur !== 'tatil' && o.tur !== 'toren');
-    const gelecek = sinav.filter(o => o.tarih >= bugun && !o.iptal);
+    const but = sinav.filter(o => o.tarih >= bugun && !o.iptal && /bütünleme/.test(o.baslik));
+    const gelecek = sinav.filter(o => o.tarih >= bugun && !o.iptal && !/bütünleme/.test(o.baslik));
     if (gelecek[0]) h += kart(gelecek[0], 'Sıradaki sınav');
     if (VERI.ortak_gorsel_degisti) h += `<div class="serit bilgi">Ortak ders sınav tarihleri görseli güncellendi; aşağıdaki ortak ders tarihleri kontrol edilene kadar eski olabilir.</div>`;
     h += `<section class="bolum"><h2>Yaklaşan sınavlar</h2><div class="kart">${gelecek.map(sinavSatiri).join('') || '<div class="bos"><b>Yaklaşan sınav yok</b></div>'}</div></section>`;
+    if (but.length) h += `<details class="bolum gecmis"><summary>Bütünleme sınavları (${but.length})</summary><div class="kart">${but.map(sinavSatiri).join('')}</div></details>`;
     const gecmis = sinav.filter(o => o.tarih < bugun).reverse();
     if (gecmis.length) h += `<details class="bolum gecmis"><summary>Geçmiş sınavlar (${gecmis.length})</summary><div class="kart">${gecmis.map(sinavSatiri).join('')}</div></details>`;
     h += `<p class="ipucu">Kurul sınavlarının saati önce yaklaşık verilir, son hafta kesinleşir. Kesin saat duyurulunca burada görünür.</p>`;
@@ -401,15 +407,37 @@ function gorSinavlar() {
   return h;
 }
 
+/* aynı güncellemede bir ders bir yerden çıkıp başka yere eklendiyse tek satır: "taşındı" */
+function degisimGrupla(liste) {
+  const cikan = /^(\d\d:\d\d) (.+) programdan çıktı$/, eklenen = /^(\d\d:\d\d) (.+?) eklendi(?: \((.*)\))?$/;
+  const kullanildi = new Set(), out = [];
+  liste.forEach((d, i) => {
+    if (kullanildi.has(i)) return;
+    const c = d.ne.match(cikan);
+    if (c) {
+      const j = liste.findIndex((e, k) => !kullanildi.has(k) && k !== i && e.zaman === d.zaman && e.program === d.program && (e.ne.match(eklenen) || [])[2] === c[2]);
+      if (j >= 0) {
+        const e = liste[j].ne.match(eklenen); kullanildi.add(j);
+        const a = tarihten(d.tarih), b = tarihten(liste[j].tarih);
+        out.push({ ...d, tarih: null, ne: `${c[2]} taşındı: ${a.getDate()} ${AY_ADI[a.getMonth()]} ${c[1]} → ${b.getDate()} ${AY_ADI[b.getMonth()]} ${e[1]}` });
+        return;
+      }
+    }
+    out.push(d);
+  });
+  return out;
+}
 function gorDegisen() {
-  const liste = DEGISIM.filter(d => !d.program || d.program === durum.program);
+  const liste = degisimGrupla(DEGISIM.filter(d => !d.program || d.program === durum.program));
   let h = '';
   if (!liste.length) h += `<div class="kart bos"><b>Henüz değişiklik yok</b></div>`;
   else h += `<div class="kart">${liste.slice(0, 80).map(d => `<div class="degisim" style="--hat:${hat(d.ders || '')}"><i></i><div><div>${d.tarih ? '<b>' + esc(insanTarih(d.tarih)) + '</b>, ' : ''}${esc(d.ne)}</div><div class="zaman">${esc(zamanFark(d.zaman))}, ${esc(d.kaynak)}</div></div></div>`).join('')}</div>`;
-  h += `<section class="bolum"><h2>Kaynaklar</h2><div class="kart">${(VERI.kaynaklar || []).map(k => `<div class="satir iki"><div class="ne"><b>${esc(k.ad)}</b><span>Son değişiklik: ${esc(zamanFark(k.degisti))}</span></div>${k.url ? `<a href="${esc(k.url)}" target="_blank" rel="noopener">Aç</a>` : '<span></span>'}</div>`).join('')}</div></section>`;
   return h;
 }
 
+function KAYNAKLAR() { let h = '';
+  h += `<section class="bolum"><h2>Kaynaklar</h2><div class="kart">${(VERI.kaynaklar || []).map(k => `<div class="satir iki"><div class="ne"><b>${esc(k.ad)}</b><span>Son değişiklik: ${esc(zamanFark(k.degisti))}</span></div>${k.url ? `<a href="${esc(k.url)}" target="_blank" rel="noopener">Aç</a>` : '<span></span>'}</div>`).join('')}</div></section>`;
+  return h; }
 function gorBen() {
   const takvim = durum.grup ? new URL(`data/takvim/${durum.program}-${durum.grup}.ics`, location.href).href : '';
   return `<section class="bolum"><h2>Numaran</h2>
@@ -418,6 +446,7 @@ function gorBen() {
   <a class="dugme" style="text-align:center;text-decoration:none" href="${esc(takvim.replace(/^https?:/, 'webcal:'))}">Takvime ekle</a>
   <div class="kopya"><input readonly value="${esc(takvim)}" aria-label="Takvim adresi"><button class="dugme ikincil" data-kopyala="${esc(takvim)}">Kopyala</button></div>
   <div class="ipucu">Android: Google Takvim → Ayarlar → Takvim ekle → URL ile.</div></div></section>` : ''}
+  ${KAYNAKLAR()}
   <section class="bolum"><h2>Hakkında</h2><p>Okulun pratik tablosu, Drive'daki ders programı, bölüm listeleri ve temsilcinin düzeltmeleri 15 dakikada bir kontrol edilir. Numaran sadece bu telefonda kalır.</p></section>`;
 }
 function formNumara(ilk) {
@@ -437,25 +466,35 @@ function gorKarsilama() {
 /* ---------- çizim ve olaylar ---------- */
 function ciz() {
   const ust = $('#ust'), ana = $('#ana'), alt = $('#alt');
+  if (!VERI || !VERI.gruplar) { ust.innerHTML = ''; alt.hidden = true; ana.innerHTML = `<div class="bos"><b>Program yüklenemedi</b>İnternet bağlantını kontrol edip sayfayı yenile.</div>`; return; }
   if (!durum.grup) { ust.innerHTML = ''; alt.hidden = true; ana.innerHTML = gorKarsilama(); bagla(); return; }
   alt.hidden = false;
   alt.querySelectorAll('button').forEach(b => b.dataset.sekme === durum.sekme ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
   ust.innerHTML = durum.sekme === 'bugun' ? ustBugun() : `<div class="basrow"><div><h1 class="gunbas">${{ pratik: 'Pratiklerim', sinav: 'Sınavlar', degisen: 'Değişenler', ben: 'Ben' }[durum.sekme]}</h1><div class="gunalt">${esc(PROGRAM_AD[durum.program] || '')}</div></div>${grupRozet()}</div>`;
-  ana.innerHTML = { bugun: gorBugun, pratik: gorPratik, sinav: gorSinavlar, degisen: gorDegisen, ben: gorBen }[durum.sekme]();
+  ana.innerHTML = (navigator.onLine === false ? `<div class="serit bilgi">İnternet yok; son kaydedilen program gösteriliyor.</div>` : '') + { bugun: gorBugun, pratik: gorPratik, sinav: gorSinavlar, degisen: gorDegisen, ben: gorBen }[durum.sekme]();
   isaretleSimdi();
   bagla();
 }
 function isaretleSimdi() {
+  document.querySelectorAll('.sonraki-etiket').forEach(e => e.remove());
   if (durum.gun !== iso(new Date())) return;
   const m = new Date().getHours() * 60 + new Date().getMinutes();
+  let isaretli = false;
   document.querySelectorAll('.durak').forEach(d => {
     const b = dk(d.dataset.bas), e = dk(d.dataset.bit);
     d.classList.toggle('gecti', e <= m);
     d.classList.toggle('simdi', b <= m && m < e);
+    if (!isaretli && e > m && !d.classList.contains('iptal')) {
+      isaretli = true;
+      const fark = b - m;
+      const metin = fark <= 0 ? 'Şimdi' : fark < 60 ? `${fark} dk sonra` : `${Math.floor(fark / 60)} sa ${fark % 60 ? (fark % 60) + ' dk ' : ''}sonra`;
+      d.querySelector('.icerik')?.insertAdjacentHTML('afterbegin', `<div class="sonraki-etiket">${metin}</div>`);
+    }
   });
 }
 function bagla() {
   document.querySelectorAll('[data-gun]').forEach(b => b.onclick = () => { durum.gun = b.dataset.gun; ciz(); });
+  document.querySelectorAll('[data-bugune]').forEach(b => b.onclick = () => { durum.gun = varsayilanGun(); ciz(); window.scrollTo({ top: 0 }); });
   document.querySelectorAll('[data-sinavgor]').forEach(b => b.onclick = () => { durum.sinavGorunum = b.dataset.sinavgor; depo.koy('sinavGorunum', durum.sinavGorunum); ciz(); window.scrollTo({ top: 0 }); });
   document.querySelectorAll('[data-hafta]').forEach(b => b.onclick = () => { durum.gun = iso(ekle(tarihten(durum.gun), +b.dataset.hafta)); ciz(); });
   document.querySelectorAll('[data-git]').forEach(b => b.onclick = () => sekmeyeGit(b.dataset.git));
@@ -484,18 +523,20 @@ function bagla() {
     durum.sekme = 'bugun'; ciz(); window.scrollTo({ top: 0 });
   };
 }
-function sekmeyeGit(s) { durum.sekme = s; ciz(); window.scrollTo({ top: 0 }); }
+function sekmeyeGit(s) { if (s === 'bugun' && durum.sekme === 'bugun') durum.gun = varsayilanGun(); durum.sekme = s; ciz(); window.scrollTo({ top: 0 }); }
 $('#alt').addEventListener('click', e => { const b = e.target.closest('[data-sekme]'); if (b) sekmeyeGit(b.dataset.sekme); });
 
 async function yukle() {
   const al = async (y, d) => { try { const r = await fetch(y, { cache: 'no-cache' }); return r.ok ? r.json() : d; } catch { return d; } };
   [VERI, LISTE, DEGISIM] = await Promise.all([al('data/veri.json', {}), al('data/liste.json', { numara: {}, oturumlar: [] }), al('data/degisiklikler.json', [])]);
-  const bugun = new Date();
-  const gun = [0, 6].includes(bugun.getDay()) ? ekle(pazartesi(bugun), 7) : bugun; // hafta sonu: gelecek pazartesi
-  durum.gun = durum.gun || iso(gun);
+  durum.gun = durum.gun || varsayilanGun();
   if (durum.numara) durum.benim = await benimOturumlar();
   ciz();
 }
 yukle();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+addEventListener('online', () => ciz()); addEventListener('offline', () => ciz());
 setInterval(() => { if (durum.sekme === 'bugun') isaretleSimdi(); }, 60000);
-document.addEventListener('visibilitychange', () => { if (!document.hidden) yukle(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) yukle();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+addEventListener('online', () => ciz()); addEventListener('offline', () => ciz()); });
