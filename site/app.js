@@ -198,7 +198,7 @@ function gorBugun() {
   if (!VERI.programlar?.[durum.program]) h += `<div class="serit bilgi">Ders programı yüklenemedi, sadece pratikler gösteriliyor.</div>`;
   if (duraklar.length) h += `<ol class="guzergah">${duraklar.map(d => d.html).join('')}</ol>`;
   else if (!ol.length) h += `<div class="bos"><b>${[0, 6].includes(tarihten(gun).getDay()) ? 'Hafta sonu' : 'Ders yok'}</b></div>`;
-  h += `<p class="guncel">Son kontrol: ${zamanFark(KONTROL.zaman || VERI.guncelleme)}</p>`;
+  h += `<p class="guncel">Program son değişti: ${zamanFark(VERI.guncelleme)}</p>`;
   return h;
 }
 function olayAdi(a) {
