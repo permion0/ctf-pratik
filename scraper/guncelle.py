@@ -171,6 +171,24 @@ def main():
         'hatalar': hatalar,
     }
 
+    # koruma: veri birden bozulduysa yayınlama (kaynak biçimi değişmiş olabilir). Bilinçli büyük değişiklikte
+    # kaynak/zorla_yayinla dosyası oluşturulursa bir kez atlanır.
+    zorla = os.path.join(KAYNAK, 'zorla_yayinla')
+    sorunlar = koruma(eski_veri, veri) if eski_veri else []
+    if sorunlar and os.path.exists(zorla):
+        sorunlar = []
+    if os.path.exists(zorla):
+        os.remove(zorla)
+    saglik = {'durum': 'durduruldu' if sorunlar else 'ok', 'sorunlar': sorunlar, 'uyarilar': capraz_kontrol(veri), 'hatalar': hatalar}
+    eski_saglik = oku_json(os.path.join(DATA, 'saglik.json'), {})
+    if {k: v for k, v in eski_saglik.items() if k != 'zaman'} != saglik:
+        saglik['zaman'] = SIMDI.isoformat()
+        yaz_json(os.path.join(DATA, 'saglik.json'), saglik)
+    if sorunlar:
+        yaz_json(os.path.join(DATA, 'durum.json'), durum)
+        print('YAYIN DURDURULDU:', sorunlar)
+        return
+
     # içerik farklarını insan diliyle yaz
     yeni_kayit += farklar(eski_veri, veri)
     karsilastir = lambda v: json.dumps({k: x for k, x in v.items() if k not in ('guncelleme', 'kaynaklar')}, sort_keys=True, ensure_ascii=False)
@@ -229,6 +247,51 @@ def duzeltme_farklari(eski, yeni):
             out.append({'zaman': SIMDI.isoformat(), 'kaynak': 'Temsilci', 'program': None if d['program'] == 'hepsi' else d['program'],
                         'tarih': d['tarih'], 'ders': d['ders'], 'ne': ne})
     return out
+
+
+def capraz_kontrol(veri):
+    """İki kaynağın birbirini doğrulaması: okul PDF'indeki sınav günleri ile Drive programındaki sınav günleri."""
+    uyarilar = []
+    tr = ((veri.get('programlar') or {}).get('TR') or {}).get('onemli', [])
+    prog_sinav = {o['tarih'] for o in tr if o['tur'] in ('ara', 'final', 'sinav')}
+    pdf_sinav = {}
+    for k in (veri.get('pratik') or {}).get('kurullar', []):
+        for g in k['gunler']:
+            ad = (g.get('olay') or {}).get('ad', '')
+            if re.search(r'SINAV', ad):
+                pdf_sinav[g['tarih']] = ad
+    for t, ad in sorted(pdf_sinav.items()):
+        if t not in prog_sinav:
+            uyarilar.append(f'Okulun pratik tablosunda {t} günü "{ad}" var, Drive programında o gün sınav görünmüyor.')
+    for t in sorted(prog_sinav - set(pdf_sinav)):
+        uyarilar.append(f'Drive programında {t} günü sınav var, okulun pratik tablosunda yok.')
+    return uyarilar
+
+
+def koruma(eski, yeni):
+    """Okunan veri birden bozulduysa (kaynak biçimi değişmiş olabilir) yayını durdurmak için sorunları döndürür."""
+    sorun = []
+    if len(yeni.get('gruplar') or []) < 8:
+        sorun.append(f"Pratik tablosundan {len(yeni.get('gruplar') or [])} grup okundu (beklenen 8).")
+    ek = {k['kurul']: len(k['gunler']) for k in (eski.get('pratik') or {}).get('kurullar', [])}
+    yk = {k['kurul']: len(k['gunler']) for k in (yeni.get('pratik') or {}).get('kurullar', [])}
+    for kurul, n in ek.items():
+        if kurul not in yk:
+            sorun.append(f'{kurul} kurulu pratik tablosundan okunamadı.')
+        elif yk[kurul] < n * 0.8:
+            sorun.append(f'{kurul} kurulunun pratik günleri {n} → {yk[kurul]} azaldı.')
+    for kod, ep in (eski.get('programlar') or {}).items():
+        yp = (yeni.get('programlar') or {}).get(kod)
+        if not yp:
+            sorun.append(f'{kod} programı okunamadı.')
+            continue
+        eg, yg = len(ep.get('gunler', {})), len(yp.get('gunler', {}))
+        ed = sum(len(l) for l in ep.get('gunler', {}).values()); yd = sum(len(l) for l in yp.get('gunler', {}).values())
+        if yg < eg * 0.85:
+            sorun.append(f'{kod} programında gün sayısı {eg} → {yg} düştü.')
+        if yd < ed * 0.85:
+            sorun.append(f'{kod} programında ders sayısı {ed} → {yd} düştü.')
+    return sorun
 
 
 def deger_adi(v):

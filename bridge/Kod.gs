@@ -74,6 +74,7 @@ function gonder() {
   const token = PROPS.getProperty('GITHUB_TOKEN');
   if (!token) throw new Error('GITHUB_TOKEN yok: Proje Ayarları → Komut dosyası özellikleri');
   try { yaz_('kaynak/izleme.json', izleme(), 'IZLEME', 'Okul sitesinde değişiklik', token); } catch (e) { console.warn('izleme: ' + e); }
+  try { bildir_(); } catch (e) { console.warn('bildirim: ' + e); }
   const v = veri();
   const govde = JSON.stringify(v);
   const ozet = Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, govde, Utilities.Charset.UTF_8));
@@ -123,3 +124,44 @@ function yaz_(yol, nesne, anahtar, mesaj, token) {
 
 /** Elle deneme: izleme sonucunu günlüğe yazar. */
 function izlemeDene() { Logger.log(JSON.stringify(izleme())); }
+
+/** Sana (bu hesabın e-postasına) mail: yeni değişiklikler, kaynaklar arası uyuşmazlık ya da durdurulan yayın. */
+const SITE = 'https://cerrahpasa-turkce-tip.vercel.app';
+function bildir_(deneme) {
+  const ham = function (yol) {
+    const r = UrlFetchApp.fetch('https://raw.githubusercontent.com/' + DEPO + '/main/' + yol + '?t=' + Date.now(), { muteHttpExceptions: true });
+    return r.getResponseCode() === 200 ? JSON.parse(r.getContentText()) : null;
+  };
+  const saglik = ham('site/data/saglik.json') || {};
+  const degis = ham('site/data/degisiklikler.json') || [];
+  const ilk = !PROPS.getProperty('SON_BILDIRIM');
+  const son = new Date(PROPS.getProperty('SON_BILDIRIM') || 0);
+  const yeni = degis.filter(function (d) { return new Date(d.zaman) > son; });
+  const saglikOzet = JSON.stringify({ d: saglik.durum, s: saglik.sorunlar, u: saglik.uyarilar, h: saglik.hatalar });
+  const saglikYeni = saglikOzet !== PROPS.getProperty('SON_SAGLIK');
+  PROPS.setProperty('SON_SAGLIK', saglikOzet);
+  if (ilk && !deneme) { PROPS.setProperty('SON_BILDIRIM', new Date().toISOString()); return; }  // ilk çalışmada eski kayıtları yollama
+  const sorunVar = saglik.durum !== 'ok' || (saglik.uyarilar || []).length || (saglik.hatalar || []).length;
+  if (!deneme && !yeni.length && !(saglikYeni && sorunVar)) return;
+  const satir = [];
+  if (saglik.durum === 'durduruldu') satir.push('YAYIN DURDURULDU: okunan veri bozuk görünüyor, site eski veriyle kaldı.', ...(saglik.sorunlar || []).map(function (x) { return '  - ' + x; }), '');
+  if ((saglik.uyarilar || []).length) satir.push('Kaynaklar birbiriyle uyuşmuyor:', ...saglik.uyarilar.map(function (x) { return '  - ' + x; }), '');
+  if ((saglik.hatalar || []).length) satir.push('Okunamayan kaynaklar:', ...saglik.hatalar.map(function (x) { return '  - ' + x; }), '');
+  if (yeni.length) {
+    satir.push(yeni.length + ' değişiklik:');
+    yeni.slice(0, 40).forEach(function (d) { satir.push('  - ' + (d.tarih ? d.tarih + ': ' : '') + d.ne + ' (' + d.kaynak + (d.program ? ', ' + d.program : '') + ')'); });
+    if (yeni.length > 40) satir.push('  … ve ' + (yeni.length - 40) + ' tane daha');
+    satir.push('');
+  }
+  if (deneme) satir.push('Bu bir deneme mailidir: bildirimler çalışıyor.', '');
+  satir.push('Site: ' + SITE, 'Değişenler sekmesinde ayrıntı ve kaynak linkleri var.');
+  const konu = saglik.durum === 'durduruldu' ? 'Pratik Pusulası: yayın durduruldu, kontrol et'
+    : sorunVar && saglikYeni ? 'Pratik Pusulası: kaynaklarda uyuşmazlık'
+    : yeni.length ? 'Pratik Pusulası: ' + yeni.length + ' değişiklik' : 'Pratik Pusulası: bildirim denemesi';
+  MailApp.sendEmail({ to: Session.getEffectiveUser().getEmail(), subject: konu, body: satir.join('\n') });
+  const enYeni = yeni.reduce(function (m, d) { return new Date(d.zaman) > m ? new Date(d.zaman) : m; }, son);
+  PROPS.setProperty('SON_BILDIRIM', (enYeni > son ? enYeni : new Date()).toISOString());
+}
+
+/** Elle deneme: kendine bir deneme maili gönderir (ilk çalıştırmada e-posta izni ister). */
+function bildirimDene() { bildir_(true); }
