@@ -17,12 +17,8 @@ const AY_ADI = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz'
 const PROGRAM_AD = { TR: 'Türkçe Tıp', MT: 'Türkçe Tıp', EN: 'İngilizce Tıp' };
 
 /* Pratik yerleri: okulun öğrenci portalındaki "1001 Pratikleri" bilgisi */
-const YER = {
-  'Anatomi': 'Temel Bilimler B Blok, 2. kat (Temel Genetik laboratuvarı)',
-  'Biyofizik': 'Temel Bilimler B Blok, 2. kat',
-  'Biyokimya': 'Temel Bilimler B Blok, 1. kat',
-  'Biyoistatistik': 'Dahiliye binası, Hakkı Ogan amfisi'
-};
+const kural = ders => (VERI.kurallar || {})[ders] || {};
+const saatEkle = (s, n) => { const t = dk(s) + n; return String(t / 60 | 0).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0'); };
 
 function hat(ad) {
   const s = (ad || '').toLocaleLowerCase('tr');
@@ -113,6 +109,23 @@ function pratikler(gun) {
     const p = out[i];
     if (p.kaynak === 'Pratik dönüşüm tablosu' && durum.benim.some(o => o.ders === p.ders && o.kurul === p.kurul) && !durum.benim.some(o => o.ders === p.ders && o.tarih === gun)) out.splice(i, 1);
   }
+  // sohbetteki düzene göre tahmini saat (liste ya da temsilci yoksa)
+  for (const p of out) {
+    if (p.bas) continue;
+    const k = kural(p.ders);
+    if ((k.iptal || []).includes(gun)) { p.iptal = true; continue; }
+    if (k.sira === 'ab_donusumlu' && p.kurul) {
+      const sira = yapilanlar(p.ders, p.kurul, (p.grup || durum.grup)[0]).indexOf(gun);
+      if (sira >= 0) {
+        const g = p.grup || durum.grup;
+        const once = siraKimde(k, sira);
+        p.bas = once === 'birlikte' ? k.saatler[0] : k.saatler[g.slice(1) === once ? 0 : 1];
+        p.bit = saatEkle(p.bas, k.sure || 60);
+        p.tahmini = true;
+        p.siraNotu = once === 'birlikte' ? 'İki grup birlikte girer' : `Bu sefer önce ${g[0]}${once} girer`;
+      }
+    } else if (k.bas) { p.bas = k.bas; p.bit = saatEkle(k.bas, k.sure || 60); p.tahmini = true; }
+  }
   // temsilci düzeltmeleri
   for (const d of VERI.duzeltmeler || []) {
     if (d.tarih !== gun) continue;
@@ -122,13 +135,34 @@ function pratikler(gun) {
     if (d.grup !== 'hepsi' && d.grup !== dg && d.grup !== dg[0]) continue;
     if (!p && (d.durum === 'ek' || d.durum === 'değişti')) { p = { ders: d.ders, kaynak: 'Temsilci' }; out.push(p); }
     if (!p) continue;
-    if (d.bas) { p.bas = d.bas; p.bit = d.bit; p.saatKaynak = 'Temsilci'; }
+    if (d.bas) { p.bas = d.bas; p.bit = d.bit || saatEkle(d.bas, kural(p.ders).sure || 60); p.saatKaynak = 'Temsilci'; p.tahmini = false; p.siraNotu = ''; }
     if (d.yer) p.yer = d.yer;
     if (d.durum === 'iptal') p.iptal = true;
     if (d.not) p.not = d.not;
     p.duzeltildi = true;
   }
   return out;
+}
+/* k.ilk: ilk pratikte önce giren ('a') ya da 'birlikte'; sonra her pratikte sıra değişir */
+function siraKimde(k, sira) {
+  if (k.ilk === 'birlikte') return sira === 0 ? 'birlikte' : (sira % 2 === 1 ? 'b' : 'a');
+  const ilk = k.ilk || 'a', diger = ilk === 'a' ? 'b' : 'a';
+  return sira % 2 === 0 ? ilk : diger;
+}
+/* bir derste grubun gerçekten yapılan pratik günleri (iptal ve olay günleri hariç), sıralı */
+function yapilanlar(ders, kurul, rakam) {
+  const k = kural(ders), out = [];
+  for (const kk of VERI.pratik?.kurullar || []) {
+    if (kk.kurul !== kurul) continue;
+    for (const s of kk.gunler) {
+      const v = (s.degerler[ders] || '').toLowerCase();
+      if (v[0] !== rakam || (k.iptal || []).includes(s.tarih)) continue;
+      if (s.olay && s.olay.dersler.includes(ders)) continue;
+      if ((VERI.duzeltmeler || []).some(d => d.tarih === s.tarih && d.durum === 'iptal' && d.ders.toLocaleLowerCase('tr') === ders.toLocaleLowerCase('tr'))) continue;
+      out.push(s.tarih);
+    }
+  }
+  return out.sort();
 }
 function olaylar(gun) {
   const out = [];
@@ -166,11 +200,13 @@ function grupRozet() {
 function durakPratik(p, gun) {
   const [vb, ve] = pratikSaati(gun);
   const kesin = !!p.bas;
+  const k = kural(p.ders);
   const bas = p.bas || vb, bit = p.bit || (p.bas ? String(Math.min(dk(p.bas) + 45, dk(ve)) / 60 | 0).padStart(2, '0') + ':' + String(Math.min(dk(p.bas) + 45, dk(ve)) % 60).padStart(2, '0') : ve);
-  const yer = p.yer || YER[p.ders] || '';
+  const yer = p.yer || k.yer || '';
   const etiket = [
     `<span class="etiket hat">${p.altgrup ? 'Alt grup ' + esc(p.altgrup) : 'Grup ' + esc(p.grup || durum.grup)}</span>`,
-    kesin ? '' : `<span class="etiket belirsiz">Saat belli değil</span>`,
+    !kesin ? `<span class="etiket belirsiz">Saat belli değil</span>` : p.tahmini ? `<span class="etiket belirsiz">Tahmini saat</span>` : '',
+    k.onluk ? `<span class="etiket">${esc(k.onluk)}</span>` : '',
     p.sinav ? `<span class="etiket dikkat">Pratik sınavı</span>` : ''
   ].join('');
   return { bas, bit, html: `<li class="durak pratik ${p.iptal ? 'iptal' : ''}" style="--hat:${hat(p.ders)}" data-bas="${bas}" data-bit="${bit}">
@@ -178,7 +214,7 @@ function durakPratik(p, gun) {
     <div class="icerik"><div class="ders">${esc(p.ders)} pratiği${p.iptal ? ' (iptal)' : ''}</div>
     ${yer ? `<div class="alt">${esc(yer)}</div>` : ''}${p.not ? `<div class="alt">${esc(p.not)}</div>` : ''}
     <div class="etiketler">${etiket}</div>
-    ${p.istisna ? `<div class="alt" style="margin-top:8px">${esc(p.ders)} listesinde ${esc(p.grup)} grubundasın.</div>` : ''}
+    ${(() => { const n = [p.istisna ? `${p.ders} listesinde ${p.grup} grubundasın.` : '', p.siraNotu ? p.siraNotu + '.' : (k.not ? k.not + '.' : '')].filter(Boolean).join(' '); return n ? `<div class="alt" style="margin-top:8px">${esc(n)}</div>` : ''; })()}
     </div></div></li>` };
 }
 
@@ -225,11 +261,8 @@ function zamanFark(isoz) {
 }
 
 /* Pratiklerim: ders ders bütün oturumlar + devamsızlık hakkı */
-function hakHesap(toplam) {
-  if (toplam <= 1) return 0;
-  if (toplam < 5) return 1;
-  return Math.floor(toplam * 0.2);
-}
+/* ders başına en fazla 1 hak; tek pratiği olan derste hak yok. Kurul toplamında her 5 pratik için 1 hak. */
+function hakHesap(toplam) { return toplam <= 1 ? 0 : 1; }
 function gorPratik() {
   const bugun = iso(new Date());
   const gruplu = {};
@@ -245,7 +278,10 @@ function gorPratik() {
   let h = '';
   for (const kurul of kurullar.sort((a, b) => (a === aktif ? -1 : b === aktif ? 1 : a.localeCompare(b)))) {
     const satirlar = Object.entries(gruplu).filter(([a]) => a.startsWith(kurul + '|'));
-    h += `<section class="bolum"><h2>${esc(kurul)} kurulu${kurul === aktif ? '' : ''}</h2>`;
+    const kurulToplam = satirlar.reduce((t, [, l]) => t + l.filter(p => !p.iptal).length, 0);
+    const kurulHak = Math.floor(kurulToplam / 5);
+    const kurulKullanilan = satirlar.reduce((t, [, l]) => t + l.filter(p => !p.iptal && durum.gitmedim[`${p.tarih}|${p.ders}`]).length, 0);
+    h += `<section class="bolum"><h2>${esc(kurul)} kurulu</h2><p>${kurulToplam} pratik, kurulda toplam ${kurulHak} devamsızlık hakkı${kurulKullanilan ? `, ${kurulKullanilan} kullandın` : ''}.</p>`;
     for (const [a, l] of satirlar) {
       const ders = a.split('|')[1];
       const gecerli = l.filter(p => !p.iptal);
@@ -258,7 +294,7 @@ function gorPratik() {
     }
     h += `</section>`;
   }
-  h += `<p class="ipucu">Devamsızlık: 5'ten az pratiği olan derste 1 hak, 5 ve fazlasında %20. Tek pratiği olan derse gitmek zorunlu. Raporlu gün devamsızlık sayılmaz.</p>`;
+  h += `<p class="ipucu">Devamsızlık: bir derste en fazla 1 hak; tek pratiği olan derse gitmek zorunlu. Kurulda her 5 pratik için 1 hak. Rapor devamsızlık sayılmaz, pratiğin asistanına verilir.</p>`;
   return h;
 }
 

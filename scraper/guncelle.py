@@ -152,6 +152,7 @@ def main():
         'pratik': pratik,
         'programlar': programlar,
         'duzeltmeler': duzeltmeler,
+        'kurallar': oku_json(os.path.join(KAYNAK, 'kurallar.json'), {}).get('dersler', {}),
         'kaynaklar': list(durum['kaynaklar'].values()),
         'kopru_alindi': durum.get('kopru_alindi'),
         'hatalar': hatalar,

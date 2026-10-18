@@ -38,7 +38,41 @@ def _uid(*p):
     return hashlib.sha1('|'.join(p).encode()).hexdigest()[:16]
 
 
-def grup_olaylari(veri, program, grup, damga, kesinler=None):
+def _ekle(s, n):
+    t = int(s[:2]) * 60 + int(s[3:]) + n
+    return f'{t // 60:02d}:{t % 60:02d}'
+
+
+def kural_saati(veri, ders, kurul, grup, tarih):
+    """Sitedeki siraKimde/yapilanlar ile aynı mantık. (bas, bit, not) ya da None."""
+    k = (veri.get('kurallar') or {}).get(ders) or {}
+    if tarih in k.get('iptal', []):
+        return 'iptal'
+    if k.get('sira') == 'ab_donusumlu':
+        yap = []
+        for kk in (veri.get('pratik') or {}).get('kurullar', []):
+            if kk['kurul'] != kurul:
+                continue
+            for g in kk['gunler']:
+                v = (g['degerler'].get(ders) or '').lower()
+                if not v.startswith(grup[0]) or g['tarih'] in k.get('iptal', []) or (g.get('olay') and ders in g['olay']['dersler']):
+                    continue
+                yap.append(g['tarih'])
+        if tarih not in yap:
+            return None
+        i = sorted(yap).index(tarih)
+        if k.get('ilk') == 'birlikte':
+            once = 'birlikte' if i == 0 else ('b' if i % 2 else 'a')
+        else:
+            ilk = k.get('ilk', 'a'); once = ilk if i % 2 == 0 else ('b' if ilk == 'a' else 'a')
+        bas = k['saatler'][0] if once == 'birlikte' or grup[1:] == once else k['saatler'][1]
+        return bas, _ekle(bas, k.get('sure', 60)), ('İki grup birlikte girer' if once == 'birlikte' else f'Bu sefer önce {grup[0]}{once} girer') + ' (tahmini)'
+    if k.get('bas'):
+        return k['bas'], _ekle(k['bas'], k.get('sure', 60)), 'Tahmini saat'
+    return None
+
+
+def grup_olaylari(veri, program, grup, damga, kesinler=None, bolum=None):
     """kesinler: {(tarih, ders): oturum} bölüm listesinden; varsa saat ondan alınır."""
     out = []
     gunler = (veri.get('programlar') or {}).get(program, {}).get('gunler', {})
@@ -55,10 +89,27 @@ def grup_olaylari(veri, program, grup, damga, kesinler=None):
                 if v in ('', '-') or not (v == grup or v == grup[0]):
                     continue
                 kesin = (kesinler or {}).get((g['tarih'], ders))
+                dg = (kesinler or {}).get(('grup', ders)) or grup
                 slot = next((x for x in gunler.get(g['tarih'], []) if x['tur'] == 'pratik'), None)
-                bas, bit = (kesin['bas'], kesin['bit']) if kesin and kesin.get('bas') else ((slot['bas'], slot['bit']) if slot else ('13:30', '16:15'))
-                aciklama = f'Grup {grup}' + (f', alt grup {kesin["grup"]}-{kesin["alt"]}' if kesin else ', kesin saat duyurulur')
-                out += _olay(_uid(program, grup, g['tarih'], ders), g['tarih'], bas, bit, f'{ders} pratiği', PRATIK_YER.get(ders, ''), aciklama, damga)
+                kural = kural_saati(veri, ders, k['kurul'], dg, g['tarih'])
+                if kural == 'iptal':
+                    continue
+                # bölüm listesi bu grubu başka güne koyduysa tablo satırını atla; aynı günse alt grup saat aralığını kullan
+                lo = [o for o in (bolum or {}).get('oturumlar', []) if o['ders'] == ders and o['kurul'] == k['kurul'] and o['grup'] == dg]
+                if lo and not kesin:
+                    bugunku = [o for o in lo if o['tarih'] == g['tarih'] and o.get('bas')]
+                    if not bugunku:
+                        continue
+                    kural = (min(o['bas'] for o in bugunku), max(o['bit'] for o in bugunku), 'Alt grubuna göre yarım saat; kesin saatin için siteye bak')
+                if kesin and kesin.get('bas'):
+                    bas, bit, aciklama = kesin['bas'], kesin['bit'], f'Alt grup {kesin["grup"]}-{kesin["alt"]}'
+                elif kural:
+                    bas, bit, aciklama = kural[0], kural[1], f'Grup {dg}. {kural[2]}'
+                else:
+                    bas, bit = (slot['bas'], slot['bit']) if slot else ('13:30', '16:15')
+                    aciklama = f'Grup {dg}, saat belli değil'
+                yer = ((veri.get('kurallar') or {}).get(ders) or {}).get('yer') or PRATIK_YER.get(ders, '')
+                out += _olay(_uid(program, grup, g['tarih'], ders), g['tarih'], bas, bit, f'{ders} pratiği', yer, aciklama, damga)
             if g.get('olay') and ('SINAV' in g['olay']['ad'] or 'ARASINAV' in g['olay']['ad']):
                 out += _olay(_uid('olay', g['tarih'], g['olay']['ad']), g['tarih'], '09:00', '12:00', g['olay']['ad'].title(), '', 'Saati programdan kontrol et', damga)
     return out
@@ -73,7 +124,7 @@ def yaz(veri, liste, data_klasoru, damga):
         for grup in gruplar:
             if (program == 'EN') != grup.startswith('1'):
                 continue
-            ics = _takvim(f'CTF 1. sınıf · {adlar.get(program, program)} {grup}', grup_olaylari(veri, program, grup, damga))
+            ics = _takvim(f'CTF 1. sınıf · {adlar.get(program, program)} {grup}', grup_olaylari(veri, program, grup, damga, bolum=liste))
             open(os.path.join(hedef, f'{program}-{grup}.ics'), 'w', encoding='utf-8').write(ics)
     # kişisel: listedeki numaralar için kesin saatli takvim (programı TR/EN numaradan bilinmez; ikisini de üret)
     for h, idx in liste.get('numara', {}).items():

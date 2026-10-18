@@ -1,0 +1,44 @@
+{
+ "_aciklama": "Pratik saat/yer kuralları. Kaynak: 4A pratik grubu duyuruları (23 Eyl - 15 Eki 2026) ve üst dönem notu. Sıra kuralı: grup her yapılan pratikte sıra değiştirir (bir önceki pratikte ilk giren bu sefer ikinci girer). Temsilci düzeltmesi her zaman önce gelir.",
+ "dersler": {
+  "Biyoistatistik": {
+   "bas": "13:30",
+   "sure": 45,
+   "yer": "TBA amfisi (Amfiler binası)",
+   "onluk": "Önlük gerekmez",
+   "not": "Bütün grup birlikte girer"
+  },
+  "Biyokimya": {
+   "sira": "ab_donusumlu",
+   "saatler": [
+    "13:30",
+    "14:30"
+   ],
+   "sure": 60,
+   "yer": "Temel Bilimler B Blok 1. kat, pratik salonu",
+   "onluk": "Önlük gerekli",
+   "iptal": [
+    "2026-09-21",
+    "2026-09-22",
+    "2026-09-23",
+    "2026-09-24"
+   ],
+   "ilk": "a"
+  },
+  "Anatomi": {
+   "sira": "ab_donusumlu",
+   "ilk": "birlikte",
+   "saatler": [
+    "13:00",
+    "14:00"
+   ],
+   "sure": 45,
+   "yer": "Temel Bilimler B Blok 2. kat",
+   "onluk": "Önlük önerilir"
+  },
+  "Biyofizik": {
+   "yer": "Temel Bilimler B Blok 2. kat",
+   "onluk": "Önlük gerekli"
+  }
+ }
+}
