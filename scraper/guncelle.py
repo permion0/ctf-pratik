@@ -170,9 +170,54 @@ def main():
     print(f'tamam · {len(yeni_kayit)} yeni değişiklik · hatalar: {hatalar or "yok"}')
 
 
+PROGRAM_AD = {'TR': 'Türkçe', 'MT': 'MT', 'EN': 'İngilizce'}
+
+
+def program_farklari(eski, yeni):
+    """Drive programında bugünden sonraki günlerde ders/saat/derslik değişiklikleri."""
+    out = []
+    bugun = SIMDI.date().isoformat()
+    for kod, yp in (yeni.get('programlar') or {}).items():
+        ep = (eski.get('programlar') or {}).get(kod)
+        if not ep:
+            continue
+        for t in sorted(set(ep['gunler']) | set(yp['gunler'])):
+            if t < bugun:
+                continue
+            a = {(x['bas'], x['ders']): x for x in ep['gunler'].get(t, [])}
+            b = {(x['bas'], x['ders']): x for x in yp['gunler'].get(t, [])}
+            for k in b.keys() - a.keys():
+                x = b[k]
+                out.append({'zaman': SIMDI.isoformat(), 'kaynak': 'Ders programı (Drive)', 'program': kod, 'tarih': t, 'ders': x['abd'] or x['ders'],
+                            'ne': f"{x['bas']} {x['ders']} eklendi" + (f" ({x['yer']})" if x['yer'] else '')})
+            for k in a.keys() - b.keys():
+                x = a[k]
+                out.append({'zaman': SIMDI.isoformat(), 'kaynak': 'Ders programı (Drive)', 'program': kod, 'tarih': t, 'ders': x['abd'] or x['ders'],
+                            'ne': f"{x['bas']} {x['ders']} programdan çıktı"})
+            for k in a.keys() & b.keys():
+                if a[k]['yer'] != b[k]['yer'] or a[k]['bit'] != b[k]['bit'] or a[k]['hoca'] != b[k]['hoca']:
+                    x, y = a[k], b[k]
+                    ne = ', '.join(f'{ad}: {x[f] or "—"} → {y[f] or "—"}' for f, ad in (('yer', 'derslik'), ('bit', 'bitiş'), ('hoca', 'hoca')) if x[f] != y[f])
+                    out.append({'zaman': SIMDI.isoformat(), 'kaynak': 'Ders programı (Drive)', 'program': kod, 'tarih': t, 'ders': y['abd'] or y['ders'],
+                                'ne': f"{y['bas']} {y['ders']}: {ne}"})
+    return out
+
+
+def duzeltme_farklari(eski, yeni):
+    a = {json.dumps(d, sort_keys=True, ensure_ascii=False) for d in eski.get('duzeltmeler') or []}
+    out = []
+    for d in yeni.get('duzeltmeler') or []:
+        if json.dumps(d, sort_keys=True, ensure_ascii=False) not in a:
+            ne = f"{d['ders']} {d['grup']}: " + {'iptal': 'iptal', 'ek': 'ek pratik'}.get(d['durum'], 'değişti')
+            ne += ''.join([f", {d['bas']}" if d['bas'] else '', f"–{d['bit']}" if d['bit'] else '', f", {d['yer']}" if d['yer'] else '', f". {d['not']}" if d['not'] else ''])
+            out.append({'zaman': SIMDI.isoformat(), 'kaynak': 'Temsilci', 'program': None if d['program'] == 'hepsi' else d['program'],
+                        'tarih': d['tarih'], 'ders': d['ders'], 'ne': ne})
+    return out
+
+
 def farklar(eski, yeni):
     """Pratik tablosundaki gün/ders/grup değişikliklerini tek tek yazar."""
-    out = []
+    out = program_farklari(eski, yeni) + duzeltme_farklari(eski, yeni)
     if not eski.get('pratik') or not yeni.get('pratik'):
         return out
     def harita(p):

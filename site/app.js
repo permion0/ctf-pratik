@@ -256,10 +256,11 @@ function gorPratik() {
 }
 
 function gorDegisen() {
-  let h = `<section class="bolum"><h2>Değişenler</h2><p>Okulun tablolarında ve temsilcinin düzeltmelerinde yakalanan her değişiklik, en yenisi üstte.</p></section>`;
-  if (!DEGISIM.length) h += `<div class="kart bos"><b>Henüz değişiklik yok</b>Kaynaklar 15 dakikada bir kontrol ediliyor. Bir şey değişince burada görünür.</div>`;
-  else h += `<div class="kart">${DEGISIM.slice(0, 80).map(d => `<div class="degisim" style="--hat:${hat(d.ders || '')}"><i></i><div><div>${d.tarih ? '<b>' + esc(insanTarih(d.tarih)) + '</b>, ' : ''}${esc(d.ne)}</div><div class="zaman">${esc(zamanFark(d.zaman))} · ${esc(d.kaynak)}</div></div></div>`).join('')}</div>`;
-  h += `<section class="bolum"><h2>İzlenen kaynaklar</h2><div class="kart">${(VERI.kaynaklar || []).map(k => `<div class="satir"><div class="ne"><b>${esc(k.ad)}</b><span>Son değişiklik: ${esc(zamanFark(k.degisti))}</span></div>${k.url ? `<a href="${esc(k.url)}" target="_blank" rel="noopener">Aç</a>` : '<span></span>'}<span></span></div>`).join('')}</div></section>`;
+  const liste = DEGISIM.filter(d => !d.program || d.program === durum.program);
+  let h = `<p class="ipucu" style="margin:0">Okulun tablolarında ve temsilcinin düzeltmelerinde yakalanan her değişiklik, en yenisi üstte.</p>`;
+  if (!liste.length) h += `<div class="kart bos"><b>Henüz değişiklik yok</b>Kaynaklar 15 dakikada bir kontrol ediliyor. Bir şey değişince burada görünür.</div>`;
+  else h += `<div class="kart">${liste.slice(0, 80).map(d => `<div class="degisim" style="--hat:${hat(d.ders || '')}"><i></i><div><div>${d.tarih ? '<b>' + esc(insanTarih(d.tarih)) + '</b>, ' : ''}${esc(d.ne)}</div><div class="zaman">${esc(zamanFark(d.zaman))} · ${esc(d.kaynak)}</div></div></div>`).join('')}</div>`;
+  h += `<section class="bolum"><h2>İzlenen kaynaklar</h2><div class="kart">${(VERI.kaynaklar || []).map(k => `<div class="satir iki"><div class="ne"><b>${esc(k.ad)}</b><span>Son değişiklik: ${esc(zamanFark(k.degisti))}</span></div>${k.url ? `<a href="${esc(k.url)}" target="_blank" rel="noopener">Kaynağı aç</a>` : '<span></span>'}</div>`).join('')}</div></section>`;
   return h;
 }
 

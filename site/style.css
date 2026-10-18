@@ -115,6 +115,8 @@ main { padding-block: 6px 24px; display: flex; flex-direction: column; gap: 18px
 .bolum > p { margin: -4px 0 0; color: var(--soluk); font-size: 15px; }
 .kart { background: var(--kagit); border-radius: 16px; box-shadow: var(--golge); padding: 14px 16px; }
 .satir { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 11px 0; border-top: 1px solid var(--cizgi); }
+.satir.iki { grid-template-columns: 1fr auto; }
+.satir.iki a { font-size: 14px; white-space: nowrap; }
 .satir:first-child { border-top: 0; padding-top: 2px; }
 .satir .tarih { font: 700 15px/1.2 var(--f-levha); font-variant-numeric: tabular-nums; min-width: 64px; }
 .satir .tarih small { display: block; font: 500 12.5px var(--f-levha); color: var(--soluk); }
