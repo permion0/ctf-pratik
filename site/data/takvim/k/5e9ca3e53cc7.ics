@@ -690,22 +690,22 @@ LOCATION:NÖİ
 DESCRIPTION:Medical History and Ethics\, Alpertunga Kara
 END:VEVENT
 BEGIN:VEVENT
-UID:d9d162b524f6cfd5@ctf-pratik
+UID:dd7b680a675aeecd@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261022T090000
 DTEND;TZID=Europe/Istanbul:20261022T094000
-SUMMARY:Clinical Decision Support Systems with Artificial Intelligence
+SUMMARY:Organization of Health Care Services
 LOCATION:NÖİ
-DESCRIPTION:Biostatistics and Medical Informatics\, Osman Mutluhan Uğurel
+DESCRIPTION:Public Health\, Mehmet Sait Değer
 END:VEVENT
 BEGIN:VEVENT
-UID:d3fcd81260010a02@ctf-pratik
+UID:1bf9e9ca39826f3b@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261022T095000
 DTEND;TZID=Europe/Istanbul:20261022T103000
-SUMMARY:What is Large Language Models (LLM) and How is it Used in Medicine?
+SUMMARY:Primary Health Care Services and Preventive Health Practices in Türkiye
 LOCATION:NÖİ
-DESCRIPTION:Biostatistics and Medical Informatics\, Osman Mutluhan Uğurel
+DESCRIPTION:Public Health\, Mehmet Sait Değer
 END:VEVENT
 BEGIN:VEVENT
 UID:734d155e46f21311@ctf-pratik
