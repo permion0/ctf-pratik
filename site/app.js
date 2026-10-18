@@ -296,7 +296,7 @@ function gorPratik() {
     }
     h += `</section>`;
   }
-  h += `<p class="ipucu">Devamsızlık (temsilci): bir derste 5 ya da daha fazla pratik varsa %80 devam zorunlu, 5'ten azsa 1 hak var. Kuruldaki bütün pratiklerin de %80'ine katılmak gerekir. Tek pratiği olan derse gitmek zorunlu.</p>`;
+  h += `<p class="ipucu">Devamsızlık (temsilci): bir derste 5 ya da daha fazla pratik varsa %80 devam zorunlu, 5'ten azsa 1 hak var. Kuruldaki bütün pratiklerin de %80'ine katılmak gerekir. Tek pratiği olan derse gitmek zorunlu. Raporlu gün devamsızlıktan sayılmaz; rapor pratiğin asistanına verilir. Pratik sınavı olan ders kendi kuralını koyabilir.</p>`;
   return h;
 }
 
