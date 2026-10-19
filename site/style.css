@@ -219,3 +219,29 @@ details.kurul { display: grid; gap: 10px; }
 .basrow { flex-wrap: wrap; row-gap: 8px; }
 .basrow > div:first-child { min-width: 0; }
 @media (max-width: 360px) { .sagust { margin-left: auto; } .bugune { padding: 0 10px; font-size: 13.5px; } }
+
+/* T6 Sirkeci–Kazlıçeşme: kalkış levhası */
+.tren { background: var(--kagit); border-radius: 16px; box-shadow: var(--golge); }
+.tren summary { list-style: none; cursor: pointer; padding: 12px 16px 6px; border-radius: 16px; }
+.tren summary::-webkit-details-marker { display: none; }
+.tren-bas { display: flex; align-items: center; gap: 10px; min-height: 28px; }
+.tren-bas b { font: 800 17px/1.1 var(--f-levha); flex: 1; min-width: 0; }
+.tren-hat { flex: none; font: 800 13px/1 var(--f-levha); color: var(--kagit); background: var(--murekkep); border-radius: 6px; padding: 5px 7px 3px; }
+.tren-ac { flex: none; width: 10px; height: 10px; border-right: 2px solid var(--soluk); border-bottom: 2px solid var(--soluk); transform: rotate(45deg) translateY(-3px); transition: transform .15s; }
+.tren[open] .tren-ac { transform: rotate(225deg) translateY(-3px); }
+.tren-satir { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--cizgi); }
+.tren-satirlar .tren-satir:first-child { border-top: 0; }
+.tren-satir > div { display: grid; min-width: 0; }
+.tren-satir > div > b { font-size: 15px; }
+.tren-satir > div > span { color: var(--soluk); font-size: 14px; line-height: 1.35; }
+.tren-saat { text-align: right; }
+.tren-saat b { font: 800 22px/1.1 var(--f-levha); font-variant-numeric: tabular-nums; }
+.tren-saat span { color: var(--vurgu); font-weight: 700; font-size: 14px; }
+.tren-govde { display: grid; gap: 12px; padding: 4px 16px 16px; border-top: 1px solid var(--cizgi); }
+.tren-durak { display: grid; gap: 6px; font-size: 14px; color: var(--soluk); padding-top: 10px; }
+.tren-durak select { min-height: 44px; border: 1.5px solid var(--cizgi); border-radius: 12px; background: var(--zemin); padding: 0 12px; font-size: 16px; color: var(--murekkep); }
+.tren-sonra { display: grid; gap: 4px; }
+.tren-sonra h3 { font-size: 15px; }
+.tren-sonra p { margin: 0; font-size: 15px; font-variant-numeric: tabular-nums; }
+.tren-govde .ipucu { margin: 0; }
+@media (prefers-reduced-motion: reduce) { .tren-ac { transition: none; } }

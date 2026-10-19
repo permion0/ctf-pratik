@@ -3,5 +3,6 @@ __pycache__/
 .DS_Store
 manual/ham/
 site/data/kontrol.json
-.claude/
+.claude/*
+!.claude/skills/
 DURUM.md

@@ -77,16 +77,50 @@ def kural_saati(veri, ders, kurul, grup, tarih):
     return None
 
 
+def _kucuk(s):
+    return (s or '').replace('I', 'ı').replace('İ', 'i').lower().strip()
+
+
+def _duzeltmeler(veri, program, tur):
+    return [d for d in veri.get('duzeltmeler') or [] if d.get('tur') == tur and d['program'] in ('hepsi', program)]
+
+
+def teorik_dersler(veri, program):
+    """{tarih: [ders]} temsilci düzeltmeleri uygulanmış (sitedeki dersler() ile aynı mantık)."""
+    gunler = {t: [dict(x) for x in l if x['tur'] not in ('pratik', 'olay')]
+              for t, l in (veri.get('programlar') or {}).get(program, {}).get('gunler', {}).items()}
+    for d in _duzeltmeler(veri, program, 'teorik'):
+        liste = gunler.setdefault(d['tarih'], [])
+        x = next((y for y in liste if _kucuk(y['ders']) == _kucuk(d['ders'])), None)
+        if not x and d['durum'] == 'ek' and d.get('bas'):
+            x = {'ders': d['ders'], 'tur': 'teorik'}; liste.append(x)
+        if not x:
+            continue
+        if d.get('bas'):
+            x['bas'], x['bit'] = d['bas'], d.get('bit') or ''
+        for k in ('yer', 'abd', 'hoca', 'not'):
+            if d.get(k):
+                x[k] = d[k]
+        if d['durum'] == 'iptal':
+            x['iptal'] = True
+    return gunler
+
+
 def grup_olaylari(veri, program, grup, damga, kesinler=None, bolum=None):
     """kesinler: {(tarih, ders): oturum} bölüm listesinden; varsa saat ondan alınır."""
     out = []
     gunler = (veri.get('programlar') or {}).get(program, {}).get('gunler', {})
-    for tarih, liste in gunler.items():
+    for tarih, liste in teorik_dersler(veri, program).items():
         for x in liste:
-            if x['tur'] in ('pratik', 'olay'):
-                continue
-            out += _olay(_uid(program, tarih, x['bas'], x['ders']), tarih, x['bas'], x['bit'], x['ders'],
-                         x.get('yer', ''), ', '.join(filter(None, [x.get('abd'), x.get('hoca')])), damga)
+            bit = x.get('bit') or _ekle(x['bas'], 40)
+            aciklama = ', '.join(filter(None, [x.get('abd'), x.get('hoca')]))
+            if x.get('not'):
+                aciklama += ('. ' if aciklama else '') + x['not']
+            if not x.get('bit'):
+                aciklama += ('. ' if aciklama else '') + 'Bitiş saati belli değil'
+            out += _olay(_uid(program, tarih, x['bas'], x['ders']), tarih, x['bas'], bit, ('İptal: ' if x.get('iptal') else '') + x['ders'],
+                         x.get('yer', ''), aciklama, damga)
+    pdz = _duzeltmeler(veri, program, 'pratik')
     for k in (veri.get('pratik') or {}).get('kurullar', []):
         for g in k['gunler']:
             for ders, deger in g['degerler'].items():
@@ -114,6 +148,16 @@ def grup_olaylari(veri, program, grup, damga, kesinler=None, bolum=None):
                     bas, bit = (slot['bas'], slot['bit']) if slot else ('13:30', '16:15')
                     aciklama = f'Grup {dg}. ' + (((veri.get('kurallar') or {}).get(ders) or {}).get('not') or 'Saat belli değil')
                 yer = ((veri.get('kurallar') or {}).get(ders) or {}).get('yer') or PRATIK_YER.get(ders, '')
+                dz = [d for d in pdz if d['tarih'] == g['tarih'] and _kucuk(d['ders']) == _kucuk(ders) and d['grup'] in ('hepsi', dg, dg[0])]
+                if any(d['durum'] == 'iptal' for d in dz):
+                    continue
+                for d in dz:
+                    if d.get('bas'):
+                        bas, bit = d['bas'], d.get('bit') or _ekle(d['bas'], 60)
+                        aciklama = f'Grup {dg}. Temsilci duyurusu' + ('' if d.get('bit') else '; bitiş saati belli değil')
+                    yer = d.get('yer') or yer
+                    if d.get('not'):
+                        aciklama += f". {d['not']}"
                 out += _olay(_uid(program, grup, g['tarih'], ders), g['tarih'], bas, bit, f'{ders} pratiği', yer, aciklama, damga)
     out += sinav_olaylari(veri, program, damga)
     return out

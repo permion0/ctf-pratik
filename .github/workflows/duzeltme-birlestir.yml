@@ -1,0 +1,48 @@
+name: Düzeltme dalını yayına al
+
+# Telefondan açılan Claude oturumu düzeltmeyi kendi dalına iter. Dal yalnızca kaynak/duzeltmeler.json'ı
+# değiştiriyorsa ve denetim geçerse main'e alınır, site güncellenir. Başka dosya değiştiyse dokunulmaz.
+on:
+  push:
+    branches-ignore: [main]
+    paths: ['kaynak/duzeltmeler.json']
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: duzeltme
+  cancel-in-progress: false
+
+jobs:
+  birlestir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Yalnızca düzeltme dosyası mı değişti
+        run: |
+          git fetch origin main
+          degisen=$(git diff --name-only origin/main...HEAD)
+          echo "$degisen"
+          if [ "$degisen" != "kaynak/duzeltmeler.json" ]; then
+            echo "::error::Dal düzeltme dosyası dışında da değişiklik içeriyor; elle birleştirilmeli."
+            exit 1
+          fi
+      - name: Main'e al, denetle, it
+        run: |
+          git config user.name "pratik-takip"
+          git config user.email "pratik-takip@users.noreply.github.com"
+          git checkout -B main origin/main
+          git merge --no-ff -m "Düzeltme: ${GITHUB_REF_NAME}" "${GITHUB_SHA}"
+          python scraper/duzeltme.py
+          git push origin main
+      - name: Siteyi güncelle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run guncelle.yml --ref main

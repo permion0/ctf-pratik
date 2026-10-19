@@ -11,7 +11,7 @@ import hashlib, html, json, os, re, sys, datetime as dt
 import requests
 
 sys.path.insert(0, os.path.dirname(__file__))
-import pratik_pdf, program as programcoz, takvim
+import pratik_pdf, program as programcoz, takvim, duzeltme
 
 KOK = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 KAYNAK = os.path.join(KOK, 'kaynak')
@@ -156,15 +156,31 @@ def main():
                 numara.setdefault(h, []).append(i)
             oturumlar.append(o)
 
+    # 5) T6 Sirkeci–Kazlıçeşme sefer çizelgesi (kaynak/tren.json); kaynak sayfadaki ilk/son tren tablosu değişirse uyarı
+    tren = oku_json(os.path.join(KAYNAK, 'tren.json'), {})
+    tren_uyari = []
+    try:
+        tren_uyari = tren_kontrol(tren, indir(tren['kaynak']).decode('utf-8', 'replace'))
+    except Exception as e:
+        hatalar.append(f'Tren saatleri sayfası: {e}')
+
+    # tablodaki + depodaki (kaynak/duzeltmeler.json) düzeltmeler; türleri (pratik/teorik/sınav) işaretlenir
+    kurallar_dersler = oku_json(os.path.join(KAYNAK, 'kurallar.json'), {}).get('dersler', {})
+    try:
+        duzeltmeler = duzeltme.birlestir(duzeltmeler, {'pratik': pratik, 'kurallar': kurallar_dersler})
+    except (json.JSONDecodeError, AttributeError, TypeError) as e:
+        hatalar.append(f'kaynak/duzeltmeler.json okunamadı: {e}')
+
     veri = {
         'guncelleme': None,  # aşağıda: içerik değiştiyse şimdi, değişmediyse eskisi
         'gruplar': (pratik or {}).get('gruplar', []),
         'pratik': pratik,
         'programlar': programlar,
         'duzeltmeler': duzeltmeler,
-        'kurallar': oku_json(os.path.join(KAYNAK, 'kurallar.json'), {}).get('dersler', {}),
+        'kurallar': kurallar_dersler,
         'ortak_sinavlar': oku_json(os.path.join(KAYNAK, 'ortak_sinavlar.json'), {}).get('sinavlar', []),
         'ortak_gorsel_degisti': (oku_json(os.path.join(KAYNAK, 'ortak_sinavlar.json'), {}).get('gorsel_sha') or '') != ((durum['kaynaklar'].get('ortak_sinav') or {}).get('ozet') or ''),
+        'tren': {k: v for k, v in tren.items() if k != 'not'},
         'kural_varsayilan': oku_json(os.path.join(KAYNAK, 'kurallar.json'), {}).get('varsayilan', {}),
         'kaynaklar': list(durum['kaynaklar'].values()),
         'kopru_alindi': durum.get('kopru_alindi'),
@@ -179,7 +195,8 @@ def main():
         sorunlar = []
     if os.path.exists(zorla):
         os.remove(zorla)
-    saglik = {'durum': 'durduruldu' if sorunlar else 'ok', 'sorunlar': sorunlar, 'uyarilar': capraz_kontrol(veri, durum.get('program_url')), 'hatalar': hatalar}
+    saglik = {'durum': 'durduruldu' if sorunlar else 'ok', 'sorunlar': sorunlar,
+              'uyarilar': capraz_kontrol(veri, durum.get('program_url')) + duzeltme.kontrol(veri) + tren_uyari, 'hatalar': hatalar}
     eski_saglik = oku_json(os.path.join(DATA, 'saglik.json'), {})
     if {k: v for k, v in eski_saglik.items() if k != 'zaman'} != saglik:
         saglik['zaman'] = SIMDI.isoformat()
@@ -238,15 +255,40 @@ def program_farklari(eski, yeni):
 
 
 def duzeltme_farklari(eski, yeni):
-    a = {json.dumps(d, sort_keys=True, ensure_ascii=False) for d in eski.get('duzeltmeler') or []}
+    imza = lambda d: json.dumps({k: v for k, v in d.items() if k not in ('tur', 'kaynak')}, sort_keys=True, ensure_ascii=False)
+    a = {imza(d) for d in eski.get('duzeltmeler') or []}
     out = []
     for d in yeni.get('duzeltmeler') or []:
-        if json.dumps(d, sort_keys=True, ensure_ascii=False) not in a:
-            ne = f"{d['ders']} {d['grup']}: " + {'iptal': 'iptal', 'ek': 'ek pratik'}.get(d['durum'], 'değişti')
+        if imza(d) not in a:
+            kim = f" {d['grup']}" if d.get('tur') == 'pratik' or d['grup'] != 'hepsi' else ''
+            ad = d['ders'] + (' pratiği' if d.get('tur') == 'pratik' else '')
+            ne = f"{ad}{kim}: " + {'iptal': 'iptal', 'ek': 'eklendi'}.get(d['durum'], 'değişti')
             ne += ''.join([f", {d['bas']}" if d['bas'] else '', f"–{d['bit']}" if d['bit'] else '', f", {d['yer']}" if d['yer'] else '', f". {d['not']}" if d['not'] else ''])
             out.append({'zaman': SIMDI.isoformat(), 'kaynak': 'Temsilci', 'program': None if d['program'] == 'hepsi' else d['program'],
                         'tarih': d['tarih'], 'ders': d['ders'], 'ne': ne})
     return out
+
+
+def _tren_saat(bas, n):
+    t = int(bas[:2]) * 60 + int(bas[3:]) + n
+    return f'{t // 60:02d}:{t % 60:02d}'
+
+
+def tren_kontrol(tren, sayfa):
+    """Kaynak sayfadaki 'ilk tren / son tren' tablosu bizim çizelgeden üretilenle aynı mı?"""
+    t = html.unescape(re.sub(r'<[^>]+>', ' ', re.sub(r'<script.*?</script>|<style.*?</style>', '', sayfa, flags=re.S)))
+    i = t.find('Kazlıçeşme Yönü')
+    if i < 0:
+        return ['T6 tren saatleri sayfasında ilk/son tren tablosu bulunamadı; sayfa değişmiş olabilir, saatler kontrol edilmeli.']
+    okunan = re.findall(r'\d\d:\d\d', t[i:i + 2500])[:28]
+    beklenen = []
+    for d in reversed(tren['duraklar']):
+        for y in tren['yonler']:
+            if d['ad'] in y['dakika']:
+                beklenen += [_tren_saat(y['ilk'], y['dakika'][d['ad']]), _tren_saat(y['son'], y['dakika'][d['ad']])]
+    if okunan != beklenen:
+        return [f'T6 Sirkeci–Kazlıçeşme ilk/son tren saatleri kaynak sayfada değişti; kaynak/tren.json güncellenmeli. Sayfada: {" ".join(okunan)}']
+    return []
 
 
 PROGRAM_ID = '1LahYrgkKN5aXe4nmUGCimOFnNf7MluHSqLmjdy92VM0'  # köprünün okuduğu Drive dosyası

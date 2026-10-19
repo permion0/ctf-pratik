@@ -1,0 +1,78 @@
+{
+ "hat": "Sirkeci–Kazlıçeşme",
+ "kaynak": "https://marmaray.istanbul/t6-sirkeci-kazlicesme-hatti-bilgileri/",
+ "not": "Her gün aynı çizelge (hafta sonu dahil), 25 dakikada bir. Günde 83 sefer: Kazlıçeşme'den 41, Sirkeci'den 42 (Bakanlık açıklamasıyla tutarlı).",
+ "aralik": 25,
+ "duraklar": [
+  {
+   "ad": "Sirkeci",
+   "de": "Sirkeci'de",
+   "den": "Sirkeci'den"
+  },
+  {
+   "ad": "Cankurtaran",
+   "de": "Cankurtaran'da",
+   "den": "Cankurtaran'dan"
+  },
+  {
+   "ad": "Kumkapı",
+   "de": "Kumkapı'da",
+   "den": "Kumkapı'dan"
+  },
+  {
+   "ad": "Yenikapı",
+   "de": "Yenikapı'da",
+   "den": "Yenikapı'dan"
+  },
+  {
+   "ad": "Cerrahpaşa",
+   "de": "Cerrahpaşa'da",
+   "den": "Cerrahpaşa'dan"
+  },
+  {
+   "ad": "Kocamustafapaşa",
+   "de": "Kocamustafapaşa'da",
+   "den": "Kocamustafapaşa'dan"
+  },
+  {
+   "ad": "Yedikule",
+   "de": "Yedikule'de",
+   "den": "Yedikule'den"
+  },
+  {
+   "ad": "Kazlıçeşme",
+   "de": "Kazlıçeşme'de",
+   "den": "Kazlıçeşme'den"
+  }
+ ],
+ "yonler": [
+  {
+   "ad": "Sirkeci yönü",
+   "ilk": "06:00",
+   "son": "22:40",
+   "dakika": {
+    "Kazlıçeşme": 0,
+    "Yedikule": 2,
+    "Kocamustafapaşa": 4,
+    "Cerrahpaşa": 6,
+    "Yenikapı": 12,
+    "Kumkapı": 14,
+    "Cankurtaran": 17
+   }
+  },
+  {
+   "ad": "Kazlıçeşme yönü",
+   "ilk": "06:00",
+   "son": "23:05",
+   "dakika": {
+    "Sirkeci": 0,
+    "Cankurtaran": 4,
+    "Kumkapı": 7,
+    "Yenikapı": 9,
+    "Cerrahpaşa": 11,
+    "Kocamustafapaşa": 13,
+    "Yedikule": 15
+   }
+  }
+ ]
+}
