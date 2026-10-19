@@ -286,9 +286,21 @@ def tren_kontrol(tren, sayfa):
         for y in tren['yonler']:
             if d['ad'] in y['dakika']:
                 beklenen += [_tren_saat(y['ilk'], y['dakika'][d['ad']]), _tren_saat(y['son'], y['dakika'][d['ad']])]
+    uyari = []
     if okunan != beklenen:
-        return [f'T6 Sirkeci–Kazlıçeşme ilk/son tren saatleri kaynak sayfada değişti; kaynak/tren.json güncellenmeli. Sayfada: {" ".join(okunan)}']
-    return []
+        uyari.append(f'T6 Sirkeci–Kazlıçeşme ilk/son tren saatleri kaynak sayfada değişti; kaynak/tren.json güncellenmeli. Sayfada: {" ".join(okunan)}')
+    # sayfanın saat listesini ürettiği veri: durak başına ilk sefer dakikası, 25 dk aralık, 41/42 sefer
+    adlar = {'kazlicesme': 'Kazlıçeşme', 'yedikule': 'Yedikule', 'kocamustafapasa': 'Kocamustafapaşa', 'cerrahpasa': 'Cerrahpaşa',
+             'yenikapi': 'Yenikapı', 'kumkapi': 'Kumkapı', 'cankurtaran': 'Cankurtaran', 'sirkeci': 'Sirkeci'}
+    for anahtar, y in zip(('to_sirkeci', 'to_kazlicesme'), tren['yonler']):
+        m = re.search(anahtar + r'\s*:\s*\{([^}]*)\}', sayfa)
+        sayfada = {adlar.get(k, k): int(v) for k, v in re.findall(r'(\w+)\s*:\s*(\d+)', m.group(1))} if m else None
+        bizde = {d: int(y['ilk'][:2]) * 60 + int(y['ilk'][3:]) + n for d, n in y['dakika'].items()}
+        if sayfada != bizde:
+            uyari.append(f"T6 {y['ad']} durak saatleri kaynak sayfada değişti ya da okunamadı; kaynak/tren.json kontrol edilmeli. Sayfada: {sayfada}")
+    if not re.search(r'i\s*\*\s*' + str(tren['aralik']) + r'\b', sayfa) or not re.search(r"'to_sirkeci'\)\s*\?\s*41\s*:\s*42", sayfa):
+        uyari.append('T6 sefer aralığı (25 dk) ya da sefer sayısı (41/42) kaynak sayfada değişmiş olabilir; kaynak/tren.json kontrol edilmeli.')
+    return uyari
 
 
 PROGRAM_ID = '1LahYrgkKN5aXe4nmUGCimOFnNf7MluHSqLmjdy92VM0'  # köprünün okuduğu Drive dosyası
