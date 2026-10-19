@@ -5383,8 +5383,8 @@ DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261019T133000
 DTEND;TZID=Europe/Istanbul:20261019T143000
 SUMMARY:Biyokimya pratiği
-LOCATION:Temel Bilimler B Blok 1. kat\, pratik salonu
-DESCRIPTION:Grup 4a. Bu sefer önce 4a girer (tahmini)
+LOCATION:Temel Bilimler B Blok 1. kat
+DESCRIPTION:Grup 4a. Temsilci duyurusu\; bitiş saati belli değil. Temsilci 15 Ekim: bu hafta önce 4a girer\, 13:30.
 END:VEVENT
 BEGIN:VEVENT
 UID:453c412bf7b1dcf5@ctf-pratik
