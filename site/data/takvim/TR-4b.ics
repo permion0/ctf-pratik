@@ -922,6 +922,15 @@ SUMMARY:Cerrahi Robotik Sistemler ve Tıpta Uygulamaları (Seçmeli)
 DESCRIPTION:Üroloji\, Bülent Önal
 END:VEVENT
 BEGIN:VEVENT
+UID:7c72f62446fd679a@ctf-pratik
+DTSTAMP:20260901T000000Z
+DTSTART;TZID=Europe/Istanbul:20261021T200000
+DTEND;TZID=Europe/Istanbul:20261021T204000
+SUMMARY:Ürogenital Sistem\, Endokrin Sistem ve Duyu Organları
+LOCATION:Zoom
+DESCRIPTION:Anatomi\, Mahmut Ercan Tanyeli. Telafi dersi. Bitiş saati belli değil
+END:VEVENT
+BEGIN:VEVENT
 UID:e476bde0c40d8e95@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261022T090000
