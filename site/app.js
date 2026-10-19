@@ -49,8 +49,7 @@ let durum = {
   grup: depo.al('grup', ''),
   gitmedim: depo.al('gitmedim', {}),
   sinavGorunum: depo.al('sinavGorunum', 'sinav'),
-  durak: depo.al('durak', 'Cerrahpaşa'),       // T6 tren kartında seçili durak
-  trenGizli: depo.al('trenGizli', false),
+  durak: depo.al('durak', 'Cerrahpaşa'),       // T6 tren panelinde seçili durak
   benim: [],                       // numaranın listelerdeki oturumları
   istisna: {}                      // 'kurul|Ders' → bu derste geçerli grup (bölüm listesi standarttan farklıysa)
 };
@@ -208,7 +207,7 @@ function ustBugun() {
   }
   const baslik = durum.gun === bugun ? 'Bugün' : durum.gun === iso(ekle(new Date(), 1)) ? 'Yarın' : GUN_ADI[d.getDay()];
   const donus = durum.gun !== varsayilanGun() ? `<button class="bugune" data-bugune="1">Bugüne dön</button>` : '';
-  return `<div class="basrow"><div><h1 class="gunbas">${baslik}</h1><div class="gunalt">${d.getDate()} ${AY_ADI[d.getMonth()]}${baslik === GUN_ADI[d.getDay()] ? '' : ', ' + GUN_ADI[d.getDay()]}</div></div><div class="sagust">${donus}${grupRozet()}</div></div>
+  return `<div class="basrow"><div><h1 class="gunbas">${baslik}</h1><div class="gunalt">${d.getDate()} ${AY_ADI[d.getMonth()]}${baslik === GUN_ADI[d.getDay()] ? '' : ', ' + GUN_ADI[d.getDay()]}</div></div><div class="sagust">${donus}${VERI.tren?.yonler ? `<button class="trenbtn" data-tren aria-haspopup="dialog">Tren</button>` : ''}${grupRozet()}</div></div>
   <div class="hafta"><button class="ok" data-hafta="-7" aria-label="Önceki hafta">‹</button>${gunler}<button class="ok" data-hafta="7" aria-label="Sonraki hafta">›</button></div>`;
 }
 /* hafta içi bugün; hafta sonu gelecek pazartesi */
@@ -270,27 +269,37 @@ function trenSatirlari() {
     }
     const s = kalan[0], ilkDurak = y.dakika[durum.durak] === 0;
     satir += `<div class="tren-satir"><div><b>${esc(y.ad)}</b><span>${ilkDurak ? 'Bu duraktan kalkar' : esc(trenKonum(y, s, simdi))}</span></div><div class="tren-saat"><b>${saatYaz(s.burada)}</b><span>${kalanYaz(s.burada - simdi)}</span></div></div>`;
-    sonra += `<p><b>${esc(y.ad)}</b>: ${kalan.slice(1, 4).map(x => saatYaz(x.burada)).join(', ') || 'bu son sefer'}${kalan.length > 1 ? `. Son sefer ${saatYaz(l[l.length - 1].burada)}` : ''}</p>`;
+    sonra += `<p><b>${esc(y.ad)}</b>, sonraki: ${kalan.slice(1, 4).map(x => saatYaz(x.burada)).join(', ') || 'bu son sefer'}${kalan.length > 1 ? `. Son sefer ${saatYaz(l[l.length - 1].burada)}` : ''}</p>`;
   }
   return { satir, sonra };
 }
-function trenKart() {
-  if (!VERI.tren?.yonler || durum.trenGizli) return '';
+/* Tren paneli: üstteki "Tren" düğmesiyle alttan açılır; programın üstünde yer kaplamaz */
+function trenPanelIcerik() {
   const { satir, sonra } = trenSatirlari();
   const secenek = VERI.tren.duraklar.map(d => `<option${d.ad === durum.durak ? ' selected' : ''}>${esc(d.ad)}</option>`).join('');
-  return `<details class="tren"${depo.al('trenAcik', false) ? ' open' : ''}><summary><div class="tren-bas"><span class="tren-hat">T6</span><b>${esc(durum.durak)}</b><span class="tren-ac" aria-hidden="true"></span></div>
-    <div class="tren-satirlar">${satir}</div></summary>
-    <div class="tren-govde"><label class="tren-durak">Durak <select data-durak>${secenek}</select></label>
-    <div class="tren-sonra"><h3>Sonraki seferler</h3>${sonra}</div>
-    <p class="ipucu">Saatler hattın sefer çizelgesinden: her gün 06:00–23:00 arası 25 dakikada bir. Tren konumu canlı değil, çizelgeye göre hesaplanır.</p>
-    <button class="dugme ikincil" data-trengizle="1">Bu kartı gizle</button></div></details>`;
+  return `<div class="panel-bas"><h2 id="trenBaslik"><span class="tren-hat">T6</span> Sirkeci–Kazlıçeşme</h2><button class="panel-kapat" data-panelkapat aria-label="Kapat">Kapat</button></div>
+    <label class="tren-durak">Durak <select data-durak>${secenek}</select></label>
+    <div class="tren-satirlar" aria-live="polite">${satir}</div>
+    <div class="tren-sonra">${sonra}</div>
+    <p class="ipucu">Saatler hattın sefer çizelgesinden: her gün 06:00–23:00 arası 25 dakikada bir. Tren konumu canlı değil, çizelgeye göre hesaplanır.</p>`;
+}
+function trenAc() {
+  let d = $('#trenPanel');
+  if (!d) {
+    d = document.createElement('dialog'); d.id = 'trenPanel'; d.className = 'panel'; d.setAttribute('aria-labelledby', 'trenBaslik');
+    d.addEventListener('click', e => { if (e.target === d || e.target.closest('[data-panelkapat]')) d.close(); });
+    d.addEventListener('change', e => { if (e.target.matches('[data-durak]')) { durum.durak = e.target.value; depo.koy('durak', durum.durak); trenYenile(); } });
+    document.body.append(d);
+  }
+  d.innerHTML = trenPanelIcerik();
+  d.showModal();
 }
 function trenYenile() {
-  const k = $('.tren');
-  if (!k) return;
+  const k = $('#trenPanel');
+  if (!k?.open) return;
   const { satir, sonra } = trenSatirlari();
   $('.tren-satirlar', k).innerHTML = satir;
-  $('.tren-sonra', k).innerHTML = `<h3>Sonraki seferler</h3>${sonra}`;
+  $('.tren-sonra', k).innerHTML = sonra;
 }
 
 function gorBugun() {
@@ -306,7 +315,7 @@ function gorBugun() {
   for (const p of pr) duraklar.push(durakPratik(p, gun));
   duraklar.sort((a, b) => dk(a.bas) - dk(b.bas));
 
-  let h = gun === varsayilanGun() ? trenKart() : '';
+  let h = '';
   const gunSinav = sinavlar().filter(o => o.tarih === gun);
   for (const o of gunSinav) h += `<div class="serit${o.tur === 'tatil' || o.tur === 'toren' ? ' bilgi' : ''}" role="status">${esc(o.baslik)}${o.saat ? ', ' + esc(o.saat) : (o.tur === 'tatil' || o.tur === 'toren' ? '' : ', saat henüz duyurulmadı')}</div>`;
   for (const o of ol.filter(o => !(gunSinav.length && /SINAV|BAYRAM|TÖREN|YILBAŞI/.test(o.ad)))) h += `<div class="serit" role="status">${esc(olayAdi(o.ad))}${o.dersler?.length && o.dersler.length < 4 ? ': ' + esc(o.dersler.join(', ')) : ''}</div>`;
@@ -518,7 +527,6 @@ function gorBen() {
   <a class="dugme" style="text-align:center;text-decoration:none" href="${esc(takvim.replace(/^https?:/, 'webcal:'))}">Takvime ekle</a>
   <div class="kopya"><input readonly value="${esc(takvim)}" aria-label="Takvim adresi"><button class="dugme ikincil" data-kopyala="${esc(takvim)}">Kopyala</button></div>
   <div class="ipucu">Android: Google Takvim → Ayarlar → Takvim ekle → URL ile.</div></div></section>` : ''}
-  ${durum.trenGizli && VERI.tren ? `<section class="bolum"><h2>T6 tren saatleri</h2><p>Bugün ekranındaki Sirkeci–Kazlıçeşme kartı gizli.</p><button class="dugme ikincil" data-trengizle="1">Kartı göster</button></section>` : ''}
   ${KAYNAKLAR()}
   <section class="bolum"><h2>Hakkında</h2><p>Okulun pratik tablosu, Drive'daki ders programı, bölüm listeleri ve temsilcinin düzeltmeleri 15 dakikada bir kontrol edilir. Numaran sadece bu telefonda kalır.</p></section>`;
 }
@@ -570,9 +578,7 @@ function bagla() {
   document.querySelectorAll('[data-bugune]').forEach(b => b.onclick = () => { durum.gun = varsayilanGun(); ciz(); window.scrollTo({ top: 0 }); });
   document.querySelectorAll('[data-sinavgor]').forEach(b => b.onclick = () => { durum.sinavGorunum = b.dataset.sinavgor; depo.koy('sinavGorunum', durum.sinavGorunum); ciz(); window.scrollTo({ top: 0 }); });
   document.querySelectorAll('[data-hafta]').forEach(b => b.onclick = () => { durum.gun = iso(ekle(tarihten(durum.gun), +b.dataset.hafta)); ciz(); });
-  document.querySelectorAll('[data-durak]').forEach(el => el.onchange = () => { durum.durak = el.value; depo.koy('durak', el.value); $('.tren-bas b').textContent = el.value; trenYenile(); });
-  document.querySelectorAll('details.tren').forEach(el => el.ontoggle = () => depo.koy('trenAcik', el.open));
-  document.querySelectorAll('[data-trengizle]').forEach(b => b.onclick = () => { durum.trenGizli = !durum.trenGizli; depo.koy('trenGizli', durum.trenGizli); ciz(); });
+  document.querySelectorAll('[data-tren]').forEach(b => b.onclick = trenAc);
   document.querySelectorAll('[data-git]').forEach(b => b.onclick = () => sekmeyeGit(b.dataset.git));
   document.querySelectorAll('[data-gitmedim]').forEach(b => b.onclick = () => {
     const k = b.dataset.gitmedim; if (durum.gitmedim[k]) delete durum.gitmedim[k]; else durum.gitmedim[k] = 1;
@@ -613,5 +619,5 @@ yukle();
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 addEventListener('online', () => ciz()); addEventListener('offline', () => ciz());
 setInterval(() => { if (durum.sekme === 'bugun') isaretleSimdi(); }, 60000);
-setInterval(() => { if (durum.sekme === 'bugun' && !document.hidden) trenYenile(); }, 15000);
+setInterval(() => { if (!document.hidden) trenYenile(); }, 15000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) yukle(); });
