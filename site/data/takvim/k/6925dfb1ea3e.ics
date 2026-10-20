@@ -810,9 +810,9 @@ UID:a41570a55bdfb0ce@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261019T095000
 DTEND;TZID=Europe/Istanbul:20261019T103000
-SUMMARY:Sağlıklı Nefes Alın!
+SUMMARY:İptal: Sağlıklı Nefes Alın!
 LOCATION:EKU
-DESCRIPTION:Göğüs Cerrahisi\, Volkan Kara
+DESCRIPTION:Göğüs Cerrahisi\, Volkan Kara. Telafisi 26 Ekim 12:10–13:00\, EKU
 END:VEVENT
 BEGIN:VEVENT
 UID:b9c3c648696a5af6@ctf-pratik
@@ -1019,6 +1019,15 @@ DTEND;TZID=Europe/Istanbul:20261026T121000
 SUMMARY:Bilim Felsefesine Giriş II
 LOCATION:EKU
 DESCRIPTION:Tıp Tarihi ve Etik\, Alpertunga Kara
+END:VEVENT
+BEGIN:VEVENT
+UID:2117634fa5bd14e7@ctf-pratik
+DTSTAMP:20260901T000000Z
+DTSTART;TZID=Europe/Istanbul:20261026T121000
+DTEND;TZID=Europe/Istanbul:20261026T130000
+SUMMARY:Sağlıklı Nefes Alın!
+LOCATION:EKU
+DESCRIPTION:Göğüs Cerrahisi\, Volkan Kara. Telafi dersi (19 Ekim'de yapılamayan ders)
 END:VEVENT
 BEGIN:VEVENT
 UID:ae5f34565ef95804@ctf-pratik
