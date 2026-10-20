@@ -9,7 +9,7 @@
     "yer": "Zoom",
     "abd": "Anatomi",
     "hoca": "Mahmut Ercan Tanyeli",
-    "not": "Telafi dersi",
+    "not": "Telafi dersi (15 Ekim'de yapılamayan dersler)",
     "duyuru": "Temsilci, WhatsApp 19 Ekim 10:40"
   },
   {
@@ -39,5 +39,61 @@
     "abd": "Göğüs Cerrahisi",
     "hoca": "Volkan Kara",
     "duyuru": "Temsilci, WhatsApp 20 Ekim"
+  },
+  {
+    "program": "TR",
+    "grup": "hepsi",
+    "bas": "17:00",
+    "bit": "",
+    "yer": "Zoom",
+    "tarih": "2026-10-23",
+    "ders": "Gastrointestinal Sistem",
+    "durum": "ek",
+    "abd": "Anatomi",
+    "hoca": "Ali İhsan Soyluoğlu",
+    "duyuru": "Temsilci, WhatsApp 20 Ekim 11:54",
+    "not": "Telafi dersi (15 Ekim'de yapılamayan ders). Link ders öncesi paylaşılacak"
+  },
+  {
+    "program": "TR",
+    "grup": "hepsi",
+    "bas": "",
+    "bit": "",
+    "yer": "",
+    "tarih": "2026-10-15",
+    "ders": "Ürogenital Sistem",
+    "durum": "iptal",
+    "abd": "Anatomi",
+    "hoca": "Mahmut Ercan Tanyeli",
+    "duyuru": "Temsilci, WhatsApp 19 Ekim 10:40",
+    "not": "Telafisi 21 Ekim 20:00, Zoom"
+  },
+  {
+    "program": "TR",
+    "grup": "hepsi",
+    "bas": "",
+    "bit": "",
+    "yer": "",
+    "tarih": "2026-10-15",
+    "ders": "Endokrin Sistem ve Duyu Organları",
+    "durum": "iptal",
+    "abd": "Anatomi",
+    "hoca": "Mahmut Ercan Tanyeli",
+    "duyuru": "Temsilci, WhatsApp 19 Ekim 10:40",
+    "not": "Telafisi 21 Ekim 20:00, Zoom"
+  },
+  {
+    "program": "TR",
+    "grup": "hepsi",
+    "bas": "",
+    "bit": "",
+    "yer": "",
+    "tarih": "2026-10-15",
+    "ders": "Gastrointestinal Sistem",
+    "durum": "iptal",
+    "abd": "Anatomi",
+    "hoca": "Ali İhsan Soyluoğlu",
+    "duyuru": "Temsilci, WhatsApp 20 Ekim 11:54",
+    "not": "Telafisi 23 Ekim 17:00, Zoom"
   }
 ]
