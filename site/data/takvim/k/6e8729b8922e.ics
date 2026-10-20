@@ -738,27 +738,27 @@ UID:366abecbdc9b0bfe@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261015T090000
 DTEND;TZID=Europe/Istanbul:20261015T094000
-SUMMARY:Ürogenital Sistem
+SUMMARY:İptal: Ürogenital Sistem
 LOCATION:EKU
-DESCRIPTION:Anatomi\, Mahmut Ercan Tanyeli
+DESCRIPTION:Anatomi\, Mahmut Ercan Tanyeli. Telafisi 21 Ekim 20:00\, Zoom
 END:VEVENT
 BEGIN:VEVENT
 UID:aebdceb0d883a16b@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261015T095000
 DTEND;TZID=Europe/Istanbul:20261015T103000
-SUMMARY:Endokrin Sistem ve Duyu Organları
+SUMMARY:İptal: Endokrin Sistem ve Duyu Organları
 LOCATION:EKU
-DESCRIPTION:Anatomi\, Mahmut Ercan Tanyeli
+DESCRIPTION:Anatomi\, Mahmut Ercan Tanyeli. Telafisi 21 Ekim 20:00\, Zoom
 END:VEVENT
 BEGIN:VEVENT
 UID:afaa6773d68c8049@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261015T104000
 DTEND;TZID=Europe/Istanbul:20261015T112000
-SUMMARY:Gastrointestinal Sistem
+SUMMARY:İptal: Gastrointestinal Sistem
 LOCATION:EKU
-DESCRIPTION:Anatomi\, Ali İhsan Soyluoğlu
+DESCRIPTION:Anatomi\, Ali İhsan Soyluoğlu. Telafisi 23 Ekim 17:00\, Zoom
 END:VEVENT
 BEGIN:VEVENT
 UID:ffedadbbb352111c@ctf-pratik
@@ -928,7 +928,7 @@ DTSTART;TZID=Europe/Istanbul:20261021T200000
 DTEND;TZID=Europe/Istanbul:20261021T204000
 SUMMARY:Ürogenital Sistem\, Endokrin Sistem ve Duyu Organları
 LOCATION:Zoom
-DESCRIPTION:Anatomi\, Mahmut Ercan Tanyeli. Telafi dersi. Bitiş saati belli değil
+DESCRIPTION:Anatomi\, Mahmut Ercan Tanyeli. Telafi dersi (15 Ekim'de yapılamayan dersler). Bitiş saati belli değil
 END:VEVENT
 BEGIN:VEVENT
 UID:e476bde0c40d8e95@ctf-pratik
@@ -983,6 +983,15 @@ DTEND;TZID=Europe/Istanbul:20261023T183000
 SUMMARY:Yabancı Dil I
 LOCATION:Çevrimiçi
 DESCRIPTION:Ortak Dersler Bölümü
+END:VEVENT
+BEGIN:VEVENT
+UID:f998e3d1a63ba474@ctf-pratik
+DTSTAMP:20260901T000000Z
+DTSTART;TZID=Europe/Istanbul:20261023T170000
+DTEND;TZID=Europe/Istanbul:20261023T174000
+SUMMARY:Gastrointestinal Sistem
+LOCATION:Zoom
+DESCRIPTION:Anatomi\, Ali İhsan Soyluoğlu. Telafi dersi (15 Ekim'de yapılamayan ders). Link ders öncesi paylaşılacak. Bitiş saati belli değil
 END:VEVENT
 BEGIN:VEVENT
 UID:06e50ee35c300439@ctf-pratik
