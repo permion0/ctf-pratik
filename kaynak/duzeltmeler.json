@@ -11,5 +11,33 @@
     "hoca": "Mahmut Ercan Tanyeli",
     "not": "Telafi dersi",
     "duyuru": "Temsilci, WhatsApp 19 Ekim 10:40"
+  },
+  {
+    "tarih": "2026-10-19",
+    "durum": "iptal",
+    "bas": "",
+    "bit": "",
+    "yer": "",
+    "not": "Telafisi 26 Ekim 12:10–13:00, EKU",
+    "program": "TR",
+    "ders": "Sağlıklı Nefes Alın!",
+    "grup": "hepsi",
+    "abd": "Göğüs Cerrahisi",
+    "hoca": "Volkan Kara",
+    "duyuru": "Temsilci, WhatsApp 20 Ekim"
+  },
+  {
+    "tarih": "2026-10-26",
+    "durum": "ek",
+    "bas": "12:10",
+    "bit": "13:00",
+    "yer": "EKU",
+    "not": "Telafi dersi (19 Ekim'de yapılamayan ders)",
+    "program": "TR",
+    "ders": "Sağlıklı Nefes Alın!",
+    "grup": "hepsi",
+    "abd": "Göğüs Cerrahisi",
+    "hoca": "Volkan Kara",
+    "duyuru": "Temsilci, WhatsApp 20 Ekim"
   }
 ]
