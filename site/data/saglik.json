@@ -1,1 +1,1 @@
-{"durum":"ok","sorunlar":[],"uyarilar":[],"hatalar":[],"zaman":"2026-10-21T09:14:57+03:00"}
+{"durum":"ok","sorunlar":[],"uyarilar":[],"hatalar":["Okul sitesi: HTTPSConnectionPool(host='service-cms.iuc.edu.tr', port=443): Read timed out. (read timeout=30)","Ortak dersler: HTTPSConnectionPool(host='service-cms.iuc.edu.tr', port=443): Read timed out. (read timeout=30)"],"zaman":"2026-10-23T18:28:50+03:00"}
