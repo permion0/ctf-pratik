@@ -755,13 +755,13 @@ LOCATION:NÖİ
 DESCRIPTION:Anatomy\, Mehmet Üzel
 END:VEVENT
 BEGIN:VEVENT
-UID:19487f31dd36fcb2@ctf-pratik
+UID:14b1b23e2f66ad36@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261027T095000
 DTEND;TZID=Europe/Istanbul:20261027T103000
-SUMMARY:Clinical Decision Support Systems with Artificial Intelligence
+SUMMARY:Endocrine System and Sense Organs
 LOCATION:NÖİ
-DESCRIPTION:Biostatistics and Medical Informatics\, Osman Mutluhan Uğurel
+DESCRIPTION:Anatomy\, Mehmet Üzel
 END:VEVENT
 BEGIN:VEVENT
 UID:b78037bebc59a588@ctf-pratik
@@ -782,13 +782,13 @@ LOCATION:NÖİ
 DESCRIPTION:Public Health\, Uğurcan Sayılı
 END:VEVENT
 BEGIN:VEVENT
-UID:74c30d5e8f224c09@ctf-pratik
+UID:e1a0d78bb8441861@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261028T095000
 DTEND;TZID=Europe/Istanbul:20261028T103000
-SUMMARY:Endocrine System and Sense Organs
+SUMMARY:Clinical Decision Support Systems with Artificial Intelligence
 LOCATION:NÖİ
-DESCRIPTION:Anatomy\, Mehmet Üzel
+DESCRIPTION:Biostatistics and Medical Informatics\, Osman Mutluhan Uğurel
 END:VEVENT
 BEGIN:VEVENT
 UID:049619f71706b872@ctf-pratik
