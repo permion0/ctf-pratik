@@ -9,6 +9,8 @@ Kaynaklar:
 """
 import hashlib, html, json, os, re, sys, datetime as dt
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 sys.path.insert(0, os.path.dirname(__file__))
 import pratik_pdf, program as programcoz, takvim, duzeltme
@@ -23,6 +25,11 @@ PORTAL_KEY = '985BBFA20CC746A98F11C92D4E591A51'
 ORTAK_KEY = 'E92E3756DEE540F79CD7D49E437D3AE0'
 TUZ = 'ctf-pratik-2026'  # numaralar sitede açık yazılmaz, bu tuzla özetlenir
 SIMDI = dt.datetime.now(dt.timezone(dt.timedelta(hours=3))).replace(microsecond=0)
+SABIR = dt.timedelta(minutes=60)  # okul sunucusu sık sık birkaç dakika yanıt vermiyor; bu kadar sürmeyen hata bildirilmez
+TOPLU = 10  # bir güncellemede aynı değişiklik bundan fazla derste olduysa günlüğe tek satır yazılır
+# geçici bağlantı hatalarında ve 5xx yanıtlarda 2 kez daha dene (5 sn, 10 sn arayla)
+OTURUM = requests.Session()
+OTURUM.mount('https://', HTTPAdapter(max_retries=Retry(total=2, backoff_factor=5, status_forcelist=(500, 502, 503, 504), allowed_methods=None)))
 
 
 def oku_json(yol, varsayilan):
@@ -48,10 +55,10 @@ def numara_ozeti(no):
 
 
 def cms_linkler(site, grup):
-    r = requests.get(CMS, params={'siteKey': site, 'Value': grup}, headers=UA, timeout=30)
+    r = OTURUM.get(CMS, params={'siteKey': site, 'Value': grup}, headers=UA, timeout=30)
     r.raise_for_status()
     out = []
-    for it in r.json()['Data']:
+    for it in r.json().get('Data') or []:
         h = it.get('HtmlContent') or ''
         for m in re.finditer(r'<a[^>]*href="([^"]+)"[^>]*>(.*?)</a>', h, re.S):
             etiket = re.sub(r'\s+', ' ', re.sub('<[^>]+>', '', html.unescape(m.group(2)))).strip()
@@ -60,7 +67,7 @@ def cms_linkler(site, grup):
 
 
 def indir(url):
-    r = requests.get(url, headers=UA, timeout=60)
+    r = OTURUM.get(url, headers=UA, timeout=60)
     r.raise_for_status()
     return r.content
 
@@ -74,6 +81,23 @@ def kaydet_kaynak(ad, icerik):
             f.write(icerik)
         return True
     return False
+
+
+def bul(liste, kosul, ne):
+    """Koşula uyan ilk öğe; yoksa ne arandığını söyleyen hata (next() boş mesajlı StopIteration verirdi)."""
+    for x in liste:
+        if kosul(x):
+            return x
+    raise LookupError(f'{ne} bulunamadı (sayfa düzeni değişmiş ya da içerik geçici olarak boş olabilir)')
+
+
+def kalici(durum, iletiler, anahtar):
+    """Hata/uyarıları ilk görüldükleri zamanla durum.json'da tutar; SABIR süresi boyunca sürenleri döndürür.
+    Böylece birkaç dakikalık sunucu kesintisi ya da yarım yüklenen sayfa mail ve uyarı üretmez."""
+    eski = durum.get('suren', {})
+    simdi = {anahtar(m): (m, eski.get(anahtar(m), SIMDI.isoformat())) for m in iletiler}
+    durum['suren'] = {**{k: v for k, v in eski.items() if not k.startswith(anahtar(''))}, **{k: ilk for k, (m, ilk) in simdi.items()}}
+    return [m for m, ilk in simdi.values() if SIMDI - dt.datetime.fromisoformat(ilk) >= SABIR]
 
 
 def main():
@@ -95,8 +119,8 @@ def main():
     pratik = eski_veri.get('pratik')
     try:
         linkler = cms_linkler(PORTAL_KEY, 'tip-egitimi')
-        pdf_url = next(l['url'] for l in linkler if 'pratik' in l['etiket'].lower() and 'dönüşüm' in l['etiket'].lower()
-                       and 'preklinik' in l['url'].lower())
+        pdf_url = bul(linkler, lambda l: 'pratik' in l['etiket'].lower() and 'dönüşüm' in l['etiket'].lower()
+                      and 'preklinik' in l['url'].lower(), 'Pratik dönüşüm PDF linki')['url']
         pdf = indir(pdf_url)
         kaynak_durumu('pratik_pdf', 'Pratik dönüşüm tablosu (okul sitesi)', pdf_url, ozet(pdf))
         if kaydet_kaynak('pratik.pdf', pdf) or not pratik:
@@ -110,7 +134,7 @@ def main():
     # 2) Ortak dersler sınav tarihleri (görsel)
     try:
         ol = cms_linkler(ORTAK_KEY, 'ortak-zorunlu-dersler')
-        gorsel = next(l['url'] for l in ol if 'sınav tarihleri' in l['baslik'].lower() and 'drive.google' in l['url'])
+        gorsel = bul(ol, lambda l: 'sınav tarihleri' in l['baslik'].lower() and 'drive.google' in l['url'], 'Sınav tarihleri görsel linki')['url']
         fid = re.search(r'/d/([^/]+)', gorsel).group(1)
         resim = indir(f'https://drive.google.com/uc?export=download&id={fid}')
         kaynak_durumu('ortak_sinav', 'Ortak dersler sınav tarihleri', gorsel, ozet(resim))
@@ -164,6 +188,11 @@ def main():
     except Exception as e:
         hatalar.append(f'Tren saatleri sayfası: {e}')
 
+    # geçici kesintileri ayıkla: yalnızca SABIR süresince devam eden internet kaynağı hataları ve tren uyarıları yayına/maile girer
+    ham_hatalar = list(hatalar)
+    hatalar = kalici(durum, hatalar, lambda m: 'hata:' + m.split(':', 1)[0] if m else 'hata:')
+    tren_uyari = kalici(durum, tren_uyari, lambda m: 'tren:' + m[:60])
+
     # tablodaki + depodaki (kaynak/duzeltmeler.json) düzeltmeler; türleri (pratik/teorik/sınav) işaretlenir
     kurallar_dersler = oku_json(os.path.join(KAYNAK, 'kurallar.json'), {}).get('dersler', {})
     try:
@@ -210,7 +239,7 @@ def main():
     yeni_kayit += farklar(eski_veri, veri)
     karsilastir = lambda v: json.dumps({k: x for k, x in v.items() if k not in ('guncelleme', 'kaynaklar')}, sort_keys=True, ensure_ascii=False)
     veri['guncelleme'] = SIMDI.isoformat() if karsilastir(veri) != karsilastir(eski_veri) or not eski_veri.get('guncelleme') else eski_veri['guncelleme']
-    yaz_json(os.path.join(DATA, 'kontrol.json'), {'zaman': SIMDI.isoformat(), 'hatalar': hatalar})
+    yaz_json(os.path.join(DATA, 'kontrol.json'), {'zaman': SIMDI.isoformat(), 'hatalar': ham_hatalar, 'bildirilen': hatalar})
     if yeni_kayit:
         gunluk = yeni_kayit + gunluk
     yaz_json(os.path.join(DATA, 'veri.json'), veri)
@@ -225,8 +254,9 @@ PROGRAM_AD = {'TR': 'Türkçe', 'MT': 'MT', 'EN': 'İngilizce'}
 
 
 def program_farklari(eski, yeni):
-    """Drive programında bugünden sonraki günlerde ders/saat/derslik değişiklikleri."""
-    out = []
+    """Drive programında bugünden sonraki günlerde ders/saat/derslik değişiklikleri.
+    Aynı değişiklik (ör. bütün derslerde derslik NÖİ → RG) TOPLU'dan fazla derste olduysa tek satır yazılır."""
+    out, ayni = [], {}
     bugun = SIMDI.date().isoformat()
     for kod, yp in (yeni.get('programlar') or {}).items():
         ep = (eski.get('programlar') or {}).get(kod)
@@ -249,9 +279,23 @@ def program_farklari(eski, yeni):
                 if a[k]['yer'] != b[k]['yer'] or a[k]['bit'] != b[k]['bit'] or a[k]['hoca'] != b[k]['hoca']:
                     x, y = a[k], b[k]
                     ne = ', '.join(f'{ad}: {x[f] or "—"} → {y[f] or "—"}' for f, ad in (('yer', 'derslik'), ('bit', 'bitiş'), ('hoca', 'hoca')) if x[f] != y[f])
-                    out.append({'zaman': SIMDI.isoformat(), 'kaynak': 'Ders programı (Drive)', 'program': kod, 'tarih': t, 'ders': y['abd'] or y['ders'],
-                                'ne': f"{y['bas']} {y['ders']}: {ne}"})
+                    ayni.setdefault((kod, ne), []).append({'zaman': SIMDI.isoformat(), 'kaynak': 'Ders programı (Drive)', 'program': kod, 'tarih': t,
+                                                          'ders': y['abd'] or y['ders'], 'ne': f"{y['bas']} {y['ders']}: {ne}"})
+    for (kod, ne), liste in ayni.items():
+        if len(liste) <= TOPLU:
+            out += liste
+            continue
+        ilk, son = liste[0]['tarih'], liste[-1]['tarih']
+        out.append({'zaman': SIMDI.isoformat(), 'kaynak': 'Ders programı (Drive)', 'program': kod, 'tarih': None, 'ders': '',
+                    'ne': f'{len(liste)} derste {ne} ({kisa_tarih(ilk)} – {kisa_tarih(son)} arası)'})
     return out
+
+
+AY = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara']
+
+
+def kisa_tarih(t):
+    return f'{int(t[8:])} {AY[int(t[5:7]) - 1]} {t[:4]}'
 
 
 def duzeltme_farklari(eski, yeni):
