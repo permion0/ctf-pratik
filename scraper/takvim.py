@@ -183,7 +183,13 @@ def sinav_olaylari(veri, program, damga):
             out += _tumgun(_uid('onemli', o['tarih'], o['tur']), o['tarih'], ad, 'Ders programından', damga)
             continue
         baslik = f"{o['kurul'] + ' kurulu ' if o.get('kurul') else ''}{TUR_AD.get(o['tur'], 'sınavı')}"
-        if o.get('saat'):
+        # temsilci duyurusu (adında "sınav" geçen düzeltme) programdaki saati geçersiz kılar; sitedeki sinavlar() ile aynı
+        d = next((d for d in veri.get('duzeltmeler') or [] if d['tarih'] == o['tarih'] and d.get('bas') and d['durum'] != 'iptal'
+                  and d['program'] in ('hepsi', program) and re.search(r's[ıi]nav', d['ders'], re.I)), None)
+        if d:
+            out += _olay(_uid('sinav', o['tarih'], o['tur']), o['tarih'], d['bas'], d.get('bit') or _ekle(d['bas'], 120), baslik, d.get('yer') or '',
+                         'Temsilci duyurdu.' + ('' if d.get('bit') else ' Bitiş saati tahmini.'), damga)
+        elif o.get('saat'):
             out += _olay(_uid('sinav', o['tarih'], o['tur']), o['tarih'], o['saat'], _ekle(o['saat'], 120), baslik, '',
                          'Programdaki saat; son hafta kesinleşir. Bitiş saati tahmini.', damga)
         else:
