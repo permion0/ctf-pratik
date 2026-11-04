@@ -1,6 +1,6 @@
 /* İnternetsiz açılış: uygulama dosyaları ve son indirilen program telefonda saklanır.
    Program verisi (data/) önce internetten istenir, olmazsa son kaydedilen gösterilir. */
-const SURUM = 'pp-2026-10-19';
+const SURUM = 'pp-2026-11-04';
 const KABUK = ['./', 'index.html', 'app.js', 'style.css', 'manifest.webmanifest', 'icon.svg', 'icon-180.png'];
 
 self.addEventListener('install', e => {

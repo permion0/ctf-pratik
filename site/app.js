@@ -547,7 +547,7 @@ function gorKarsilama() {
 /* ---------- çizim ve olaylar ---------- */
 function ciz() {
   const ust = $('#ust'), ana = $('#ana'), alt = $('#alt');
-  if (!VERI || !VERI.gruplar) { ust.innerHTML = ''; alt.hidden = true; ana.innerHTML = `<div class="bos"><b>Program yüklenemedi</b>İnternet bağlantını kontrol edip sayfayı yenile.</div>`; return; }
+  if (!VERI || !VERI.gruplar) { ust.innerHTML = ''; alt.hidden = true; ana.innerHTML = `<div class="bos"><b>Program alınamadı</b>Sunucuya ulaşılamadı. İnternet açıksa farklı bir ağ (Wi-Fi yerine mobil veri ya da tersi) dene.<br><button class="dugme" id="tekrar">Tekrar dene</button></div>`; $('#tekrar').onclick = () => { ana.innerHTML = '<div class="bos">Yükleniyor…</div>'; yukle(); }; return; }
   if (!durum.grup) { ust.innerHTML = ''; alt.hidden = true; ana.innerHTML = gorKarsilama(); bagla(); return; }
   alt.hidden = false;
   alt.querySelectorAll('button').forEach(b => b.dataset.sekme === durum.sekme ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
@@ -609,7 +609,19 @@ function sekmeyeGit(s) { if (s === 'bugun' && durum.sekme === 'bugun') durum.gun
 $('#alt').addEventListener('click', e => { const b = e.target.closest('[data-sekme]'); if (b) sekmeyeGit(b.dataset.sekme); });
 
 async function yukle() {
-  const al = async (y, d) => { try { const r = await fetch(y, { cache: 'no-cache' }); return r.ok ? r.json() : d; } catch { return d; } };
+  // Yavaş ya da kararsız bağlantıda 3 deneme; hepsi olmazsa telefondaki son kayıt
+  const al = async (y, d) => {
+    for (let k = 0; k < 3; k++) {
+      try {
+        const ip = new AbortController(), t = setTimeout(() => ip.abort(), 12000);
+        const r = await fetch(y, { cache: 'no-cache', signal: ip.signal }); clearTimeout(t);
+        if (r.ok) return await r.json();
+      } catch {}
+      await new Promise(c => setTimeout(c, 1500 * (k + 1)));
+    }
+    try { const m = await caches.match(y, { ignoreSearch: true }); if (m) return await m.json(); } catch {}
+    return d;
+  };
   [VERI, LISTE, DEGISIM] = await Promise.all([al('data/veri.json', {}), al('data/liste.json', { numara: {}, oturumlar: [] }), al('data/degisiklikler.json', [])]);
   durum.gun = durum.gun || varsayilanGun();
   if (durum.numara) durum.benim = await benimOturumlar();
