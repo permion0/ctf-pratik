@@ -63,10 +63,11 @@ def kural_saati(veri, ders, kurul, grup, tarih):
         if tarih not in yap:
             return None
         i = sorted(yap).index(tarih)
-        if k.get('ilk') == 'birlikte':
+        ilk0 = (k.get('ilk_grup') or {}).get(f'{kurul}:{grup[0]}') or k.get('ilk')
+        if ilk0 == 'birlikte':
             once = 'birlikte' if i == 0 else ('b' if i % 2 else 'a')
         else:
-            ilk = k.get('ilk', 'a'); once = ilk if i % 2 == 0 else ('b' if ilk == 'a' else 'a')
+            ilk = ilk0 or 'a'; once = ilk if i % 2 == 0 else ('b' if ilk == 'a' else 'a')
         bas = k['saatler'][0] if once == 'birlikte' or grup[1:] == once else k['saatler'][1]
         return bas, _ekle(bas, k.get('sure', 60)), ('İki grup birlikte girer' if once == 'birlikte' else f'Bu sefer önce {grup[0]}{once} girer') + ' (tahmini)'
     if k.get('sira') == 'liste':

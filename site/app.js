@@ -120,7 +120,7 @@ function pratikler(gun) {
       const sira = yapilanlar(p.ders, p.kurul, (p.grup || durum.grup)[0]).indexOf(gun);
       if (sira >= 0) {
         const g = p.grup || durum.grup;
-        const once = siraKimde(k, sira);
+        const once = siraKimde(k, sira, `${p.kurul}:${g[0]}`);
         p.bas = once === 'birlikte' ? k.saatler[0] : k.saatler[g.slice(1) === once ? 0 : 1];
         p.bit = saatEkle(p.bas, k.sure || 60); p.bitTahmini = true;
         p.tahmini = true;
@@ -148,9 +148,11 @@ function pratikler(gun) {
   return out;
 }
 /* k.ilk: ilk pratikte önce giren ('a') ya da 'birlikte'; sonra her pratikte sıra değişir */
-function siraKimde(k, sira) {
-  if (k.ilk === 'birlikte') return sira === 0 ? 'birlikte' : (sira % 2 === 1 ? 'b' : 'a');
-  const ilk = k.ilk || 'a', diger = ilk === 'a' ? 'b' : 'a';
+/* k.ilk_grup: {"1002:4": "b"} gibi, o kurulda o grubun ilk pratiğinde önce giren (bilinen istisna) */
+function siraKimde(k, sira, anahtar) {
+  const ilk0 = (k.ilk_grup || {})[anahtar] || k.ilk;
+  if (ilk0 === 'birlikte') return sira === 0 ? 'birlikte' : (sira % 2 === 1 ? 'b' : 'a');
+  const ilk = ilk0 || 'a', diger = ilk === 'a' ? 'b' : 'a';
   return sira % 2 === 0 ? ilk : diger;
 }
 /* bir derste grubun gerçekten yapılan pratik günleri (iptal ve olay günleri hariç), sıralı */
@@ -310,7 +312,7 @@ function gorBugun() {
   const duraklar = [];
   for (const x of ds) {
     const bit = x.bit || saatEkle(x.bas, 40);
-    duraklar.push({ bas: x.bas, bit, html: `<li class="durak ${x.tur === 'ortak' ? 'ara' : ''} ${x.iptal ? 'iptal' : ''}" style="--hat:${hat(x.abd || x.ders)}" data-bas="${x.bas}" data-bit="${bit}"><div class="saat">${x.bas}<small>${x.bit || ''}</small></div><div class="nokta"></div><div class="icerik"><div class="ders">${esc(x.ders)}${x.iptal ? ' (iptal)' : ''}</div><div class="alt">${esc([kisaDers(x.abd), x.hoca, x.yer].filter(Boolean).join(', '))}</div>${x.not ? `<div class="alt">${esc(x.not)}</div>` : ''}${x.duzeltildi ? `<div class="etiketler"><span class="etiket">Temsilci duyurusu</span></div>` : ''}</div></li>` });
+    duraklar.push({ bas: x.bas, bit, html: `<li class="durak ${x.tur === 'ortak' ? 'ara' : ''} ${x.iptal ? 'iptal' : ''}" style="--hat:${hat(x.abd || x.ders)}" data-bas="${x.bas}" data-bit="${bit}"><div class="saat">${x.bas}<small>${x.bit || ''}</small></div><div class="nokta"></div><div class="icerik"><div class="ders">${esc(x.ders)}${x.iptal ? ' (iptal)' : ''}</div><div class="alt">${esc([kisaDers(x.abd), x.hoca, x.yer].filter(Boolean).join(', '))}</div>${(x.not || /panel/i.test(x.ders)) ? `<div class="alt">${esc(x.not || 'Panel: yoklama alınıyor')}</div>` : ''}${x.duzeltildi ? `<div class="etiketler"><span class="etiket">Temsilci duyurusu</span></div>` : ''}</div></li>` });
   }
   for (const p of pr) duraklar.push(durakPratik(p, gun));
   duraklar.sort((a, b) => dk(a.bas) - dk(b.bas));
@@ -384,7 +386,7 @@ function gorPratik() {
     }
     h += `</details>`;
   }
-  h += `<p class="ipucu">Devamsızlık (temsilci): bir derste 5 ya da daha fazla pratik varsa %80 devam zorunlu, 5'ten azsa 1 hak var. Kuruldaki bütün pratiklerin de %80'ine katılmak gerekir. İptal edilen pratiğin telafisi yapılır, toplamda sayılır. Tek pratiği olan derse gitmek zorunlu. Raporlu gün devamsızlıktan sayılmaz; rapor pratiğin asistanına verilir. Pratik sınavı olan ders kendi kuralını koyabilir.</p>`;
+  h += `<p class="ipucu">Devamsızlık (temsilci): bir derste 5 ya da daha fazla pratik varsa %80 devam zorunlu, 5'ten azsa 1 hak var. Kuruldaki bütün pratiklerin de %80'ine katılmak gerekir. İptal edilen pratiğin telafisi yapılır, toplamda sayılır. Tek pratiği olan derse gitmek zorunlu. Raporlu gün devamsızlıktan sayılmaz; rapor pratiğin asistanına verilir. Pratik sınavı olan ders kendi kuralını koyabilir. Panel derslerde de resmi yoklama alınıyor; devam pratikler gibi takip ediliyor.</p>`;
   return h;
 }
 

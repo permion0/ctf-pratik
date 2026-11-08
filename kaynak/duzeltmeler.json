@@ -119,5 +119,29 @@
     "yer": "",
     "not": "",
     "duyuru": "Kullanıcı bildirdi, 2 Kasım"
+  },
+  {
+    "tarih": "2026-11-09",
+    "program": "TR",
+    "ders": "Biyokimya",
+    "durum": "değişti",
+    "grup": "4b",
+    "bas": "13:30",
+    "bit": "",
+    "yer": "",
+    "not": "Bu sefer önce 4b girer",
+    "duyuru": "Kullanıcı bildirdi, 8 Kasım"
+  },
+  {
+    "tarih": "2026-11-09",
+    "program": "TR",
+    "ders": "Biyokimya",
+    "durum": "değişti",
+    "grup": "4a",
+    "bas": "14:30",
+    "bit": "",
+    "yer": "",
+    "not": "Bu sefer önce 4b girer",
+    "duyuru": "Kullanıcı bildirdi, 8 Kasım"
   }
 ]
