@@ -5425,11 +5425,11 @@ END:VEVENT
 BEGIN:VEVENT
 UID:e3b530dd340e1dec@ctf-pratik
 DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261109T133000
-DTEND;TZID=Europe/Istanbul:20261109T143000
+DTSTART;TZID=Europe/Istanbul:20261109T143000
+DTEND;TZID=Europe/Istanbul:20261109T153000
 SUMMARY:Biyokimya pratiği
 LOCATION:Temel Bilimler B Blok 1. kat\, pratik salonu
-DESCRIPTION:Grup 4a. Bu sefer önce 4a girer (tahmini)
+DESCRIPTION:Grup 4a. Temsilci duyurusu\; bitiş saati belli değil. Bu sefer önce 4b girer
 END:VEVENT
 BEGIN:VEVENT
 UID:97d39a22bb5d745b@ctf-pratik
@@ -5451,11 +5451,11 @@ END:VEVENT
 BEGIN:VEVENT
 UID:8878478193fd10ff@ctf-pratik
 DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261124T143000
-DTEND;TZID=Europe/Istanbul:20261124T153000
+DTSTART;TZID=Europe/Istanbul:20261124T133000
+DTEND;TZID=Europe/Istanbul:20261124T143000
 SUMMARY:Biyokimya pratiği
 LOCATION:Temel Bilimler B Blok 1. kat\, pratik salonu
-DESCRIPTION:Grup 4a. Bu sefer önce 4b girer (tahmini)
+DESCRIPTION:Grup 4a. Bu sefer önce 4a girer (tahmini)
 END:VEVENT
 BEGIN:VEVENT
 UID:b05613428ee10e58@ctf-pratik
@@ -5477,20 +5477,20 @@ END:VEVENT
 BEGIN:VEVENT
 UID:c5f1d3ef0a14f1d0@ctf-pratik
 DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261202T133000
-DTEND;TZID=Europe/Istanbul:20261202T143000
+DTSTART;TZID=Europe/Istanbul:20261202T143000
+DTEND;TZID=Europe/Istanbul:20261202T153000
 SUMMARY:Biyokimya pratiği
 LOCATION:Temel Bilimler B Blok 1. kat\, pratik salonu
-DESCRIPTION:Grup 4a. Bu sefer önce 4a girer (tahmini)
+DESCRIPTION:Grup 4a. Bu sefer önce 4b girer (tahmini)
 END:VEVENT
 BEGIN:VEVENT
 UID:f8fe5c9ce3083762@ctf-pratik
 DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261209T143000
-DTEND;TZID=Europe/Istanbul:20261209T153000
+DTSTART;TZID=Europe/Istanbul:20261209T133000
+DTEND;TZID=Europe/Istanbul:20261209T143000
 SUMMARY:Biyokimya pratiği
 LOCATION:Temel Bilimler B Blok 1. kat\, pratik salonu
-DESCRIPTION:Grup 4a. Bu sefer önce 4b girer (tahmini)
+DESCRIPTION:Grup 4a. Bu sefer önce 4a girer (tahmini)
 END:VEVENT
 BEGIN:VEVENT
 UID:384b56193891d93d@ctf-pratik

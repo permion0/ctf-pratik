@@ -5425,11 +5425,11 @@ END:VEVENT
 BEGIN:VEVENT
 UID:6b2633aaf7326c6d@ctf-pratik
 DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261109T143000
-DTEND;TZID=Europe/Istanbul:20261109T153000
+DTSTART;TZID=Europe/Istanbul:20261109T133000
+DTEND;TZID=Europe/Istanbul:20261109T143000
 SUMMARY:Biyokimya pratiği
 LOCATION:Temel Bilimler B Blok 1. kat\, pratik salonu
-DESCRIPTION:Grup 4b. Bu sefer önce 4a girer (tahmini)
+DESCRIPTION:Grup 4b. Temsilci duyurusu\; bitiş saati belli değil. Bu sefer önce 4b girer
 END:VEVENT
 BEGIN:VEVENT
 UID:a11b0e652181ba73@ctf-pratik
@@ -5451,11 +5451,11 @@ END:VEVENT
 BEGIN:VEVENT
 UID:ecd0f8abdd87aa70@ctf-pratik
 DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261124T133000
-DTEND;TZID=Europe/Istanbul:20261124T143000
+DTSTART;TZID=Europe/Istanbul:20261124T143000
+DTEND;TZID=Europe/Istanbul:20261124T153000
 SUMMARY:Biyokimya pratiği
 LOCATION:Temel Bilimler B Blok 1. kat\, pratik salonu
-DESCRIPTION:Grup 4b. Bu sefer önce 4b girer (tahmini)
+DESCRIPTION:Grup 4b. Bu sefer önce 4a girer (tahmini)
 END:VEVENT
 BEGIN:VEVENT
 UID:d34cd877a87a773b@ctf-pratik
@@ -5469,11 +5469,11 @@ END:VEVENT
 BEGIN:VEVENT
 UID:ed2e0d5494a6772e@ctf-pratik
 DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261202T143000
-DTEND;TZID=Europe/Istanbul:20261202T153000
+DTSTART;TZID=Europe/Istanbul:20261202T133000
+DTEND;TZID=Europe/Istanbul:20261202T143000
 SUMMARY:Biyokimya pratiği
 LOCATION:Temel Bilimler B Blok 1. kat\, pratik salonu
-DESCRIPTION:Grup 4b. Bu sefer önce 4a girer (tahmini)
+DESCRIPTION:Grup 4b. Bu sefer önce 4b girer (tahmini)
 END:VEVENT
 BEGIN:VEVENT
 UID:e2f7f8f1a9b45cfd@ctf-pratik
@@ -5486,11 +5486,11 @@ END:VEVENT
 BEGIN:VEVENT
 UID:0717bbcb43683168@ctf-pratik
 DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261209T133000
-DTEND;TZID=Europe/Istanbul:20261209T143000
+DTSTART;TZID=Europe/Istanbul:20261209T143000
+DTEND;TZID=Europe/Istanbul:20261209T153000
 SUMMARY:Biyokimya pratiği
 LOCATION:Temel Bilimler B Blok 1. kat\, pratik salonu
-DESCRIPTION:Grup 4b. Bu sefer önce 4b girer (tahmini)
+DESCRIPTION:Grup 4b. Bu sefer önce 4a girer (tahmini)
 END:VEVENT
 BEGIN:VEVENT
 UID:c81706a7ec2e20ea@ctf-pratik

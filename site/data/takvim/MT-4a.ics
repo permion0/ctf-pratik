@@ -5344,11 +5344,11 @@ END:VEVENT
 BEGIN:VEVENT
 UID:ee87481e7d54adfc@ctf-pratik
 DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261109T133000
-DTEND;TZID=Europe/Istanbul:20261109T143000
+DTSTART;TZID=Europe/Istanbul:20261109T143000
+DTEND;TZID=Europe/Istanbul:20261109T153000
 SUMMARY:Biyokimya pratiği
 LOCATION:Temel Bilimler B Blok 1. kat\, pratik salonu
-DESCRIPTION:Grup 4a. Bu sefer önce 4a girer (tahmini)
+DESCRIPTION:Grup 4a. Bu sefer önce 4b girer (tahmini)
 END:VEVENT
 BEGIN:VEVENT
 UID:a6d6f85da1ddc97c@ctf-pratik
@@ -5370,11 +5370,11 @@ END:VEVENT
 BEGIN:VEVENT
 UID:66a6040430c84c1b@ctf-pratik
 DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261124T143000
-DTEND;TZID=Europe/Istanbul:20261124T153000
+DTSTART;TZID=Europe/Istanbul:20261124T133000
+DTEND;TZID=Europe/Istanbul:20261124T143000
 SUMMARY:Biyokimya pratiği
 LOCATION:Temel Bilimler B Blok 1. kat\, pratik salonu
-DESCRIPTION:Grup 4a. Bu sefer önce 4b girer (tahmini)
+DESCRIPTION:Grup 4a. Bu sefer önce 4a girer (tahmini)
 END:VEVENT
 BEGIN:VEVENT
 UID:09d0554e66ee7ee4@ctf-pratik
@@ -5396,20 +5396,20 @@ END:VEVENT
 BEGIN:VEVENT
 UID:a812fa598519d006@ctf-pratik
 DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261202T133000
-DTEND;TZID=Europe/Istanbul:20261202T143000
+DTSTART;TZID=Europe/Istanbul:20261202T143000
+DTEND;TZID=Europe/Istanbul:20261202T153000
 SUMMARY:Biyokimya pratiği
 LOCATION:Temel Bilimler B Blok 1. kat\, pratik salonu
-DESCRIPTION:Grup 4a. Bu sefer önce 4a girer (tahmini)
+DESCRIPTION:Grup 4a. Bu sefer önce 4b girer (tahmini)
 END:VEVENT
 BEGIN:VEVENT
 UID:33f8a1c4b8bc7492@ctf-pratik
 DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261209T143000
-DTEND;TZID=Europe/Istanbul:20261209T153000
+DTSTART;TZID=Europe/Istanbul:20261209T133000
+DTEND;TZID=Europe/Istanbul:20261209T143000
 SUMMARY:Biyokimya pratiği
 LOCATION:Temel Bilimler B Blok 1. kat\, pratik salonu
-DESCRIPTION:Grup 4a. Bu sefer önce 4b girer (tahmini)
+DESCRIPTION:Grup 4a. Bu sefer önce 4a girer (tahmini)
 END:VEVENT
 BEGIN:VEVENT
 UID:2eded867d38eb2a9@ctf-pratik
