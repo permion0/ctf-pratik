@@ -1508,22 +1508,22 @@ LOCATION:RG
 DESCRIPTION:Thorax Surgery\, Akif Turna
 END:VEVENT
 BEGIN:VEVENT
-UID:695a2ee1cfd02fee@ctf-pratik
+UID:11bb501051b99eee@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261215T104000
 DTEND;TZID=Europe/Istanbul:20261215T112000
-SUMMARY:Structure\, Nuclear Organization and Dynamics of Chromatin I
+SUMMARY:Signal Transduction with Cell Surfaces Receptors I
 LOCATION:RG
-DESCRIPTION:Medical Biology\, Yelda Tarkan Argüden
+DESCRIPTION:Medical Biology\, Ayşe Nur Buyru
 END:VEVENT
 BEGIN:VEVENT
-UID:7f2ff357aae49e08@ctf-pratik
+UID:5039f926dd0bb030@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261215T113000
 DTEND;TZID=Europe/Istanbul:20261215T121000
-SUMMARY:Structure\, Nuclear Organization and Dynamics of Chromatin II
+SUMMARY:Signal Transduction with Cell Surfaces Receptors II
 LOCATION:RG
-DESCRIPTION:Medical Biology\, Yelda Tarkan Argüden
+DESCRIPTION:Medical Biology\, Ayşe Nur Buyru
 END:VEVENT
 BEGIN:VEVENT
 UID:9ec9aab10897eed0@ctf-pratik
@@ -1562,22 +1562,22 @@ LOCATION:RG
 DESCRIPTION:Biophysics\, Devrim Sarıbal
 END:VEVENT
 BEGIN:VEVENT
-UID:2e3d340e629e665a@ctf-pratik
+UID:db30b693cd5891cf@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261217T090000
 DTEND;TZID=Europe/Istanbul:20261217T094000
-SUMMARY:Signal Transduction with Cell Surfaces Receptors I
+SUMMARY:Biological Effects of Ionian Radiation
 LOCATION:RG
-DESCRIPTION:Medical Biology\, Ayşe Nur Buyru
+DESCRIPTION:Biophysics\, Devrim Sarıbal
 END:VEVENT
 BEGIN:VEVENT
-UID:099116de5419dfde@ctf-pratik
+UID:2cbe96f6f3b7577f@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261217T095000
 DTEND;TZID=Europe/Istanbul:20261217T103000
-SUMMARY:Signal Transduction with Cell Surfaces Receptors II
+SUMMARY:Effects of Radiation at Cellular Level
 LOCATION:RG
-DESCRIPTION:Medical Biology\, Ayşe Nur Buyru
+DESCRIPTION:Biophysics\, Devrim Sarıbal
 END:VEVENT
 BEGIN:VEVENT
 UID:c3275780720f3713@ctf-pratik
@@ -1760,22 +1760,22 @@ LOCATION:RG
 DESCRIPTION:Biostatistics and Medical Informatics\, Osman M. Uğurel
 END:VEVENT
 BEGIN:VEVENT
-UID:a0bbb4fd3b6ccb46@ctf-pratik
+UID:80460dfe4412b115@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261225T104000
 DTEND;TZID=Europe/Istanbul:20261225T112000
-SUMMARY:Biological Effects of Ionian Radiation
+SUMMARY:Structure\, Nuclear Organization and Dynamics of Chromatin I
 LOCATION:RG
-DESCRIPTION:Biophysics\, Devrim Sarıbal
+DESCRIPTION:Medical Biology\, Yelda Tarkan Argüden
 END:VEVENT
 BEGIN:VEVENT
-UID:5c9129b886abfe0f@ctf-pratik
+UID:5a12e4ec3192356e@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261225T113000
 DTEND;TZID=Europe/Istanbul:20261225T121000
-SUMMARY:Effects of Radiation at Cellular Level
+SUMMARY:Structure\, Nuclear Organization and Dynamics of Chromatin II
 LOCATION:RG
-DESCRIPTION:Biophysics\, Devrim Sarıbal
+DESCRIPTION:Medical Biology\, Yelda Tarkan Argüden
 END:VEVENT
 BEGIN:VEVENT
 UID:13b2adb5e8751799@ctf-pratik
