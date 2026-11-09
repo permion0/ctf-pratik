@@ -51,7 +51,8 @@ let durum = {
   sinavGorunum: depo.al('sinavGorunum', 'sinav'),
   durak: depo.al('durak', 'Cerrahpaşa'),       // T6 tren panelinde seçili durak
   benim: [],                       // numaranın listelerdeki oturumları
-  istisna: {}                      // 'kurul|Ders' → bu derste geçerli grup (bölüm listesi standarttan farklıysa)
+  istisna: {},                     // 'kurul|Ders' → bu derste geçerli grup (bölüm listesi standarttan farklıysa)
+  listeGrubu: {}                   // 'kurul|Ders' → bölüm listesindeki grup; sonraki kurullarda da geçerli (yeni liste gelene kadar)
 };
 
 /* ---------- grup ve oturumlar ---------- */
@@ -74,11 +75,18 @@ async function ozetle(no) {
 async function benimOturumlar() {
   if (!LISTE || !durum.numara || !crypto.subtle) return [];
   const h = await ozetle(durum.numara);
-  durum.istisna = {};
-  for (const l of LISTE.istisna || []) if (l.gruplar[h]) durum.istisna[`${l.kurul}|${l.ders}`] = l.gruplar[h];
-  return (LISTE.numara[h] || []).map(i => LISTE.oturumlar[i]);
+  durum.istisna = {}; durum.listeGrubu = {};
+  for (const l of LISTE.istisna || []) if (l.gruplar[h]) durum.istisna[`${l.kurul}|${l.ders}`] = durum.listeGrubu[`${l.kurul}|${l.ders}`] = l.gruplar[h];
+  const benim = (LISTE.numara[h] || []).map(i => LISTE.oturumlar[i]);
+  for (const o of benim) durum.listeGrubu[`${o.kurul}|${o.ders}`] ??= o.grup;
+  return benim;
 }
-const dersGrubu = (kurul, ders) => durum.istisna[`${kurul}|${ders}`] || durum.grup;
+/* o kurulun listesi; yoksa aynı dersin önceki kuruldaki listesi (bölümler grupları kurul kurul değiştirmiyor); yoksa numara aralığı */
+const dersGrubu = (kurul, ders) => {
+  if (durum.istisna[`${kurul}|${ders}`]) return durum.istisna[`${kurul}|${ders}`];
+  const onceki = Object.keys(durum.listeGrubu).filter(k => k.endsWith('|' + ders) && k.split('|')[0] < kurul).sort().pop();
+  return onceki ? durum.listeGrubu[onceki] : durum.grup;
+};
 
 /* bir gün için öğrencinin pratikleri: tablo + liste + temsilci düzeltmesi */
 function grupUyar(deger, grup) {
