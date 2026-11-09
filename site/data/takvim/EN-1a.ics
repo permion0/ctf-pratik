@@ -1562,22 +1562,22 @@ LOCATION:RG
 DESCRIPTION:Biophysics\, Devrim Sarıbal
 END:VEVENT
 BEGIN:VEVENT
-UID:db30b693cd5891cf@ctf-pratik
+UID:2e3d340e629e665a@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261217T090000
 DTEND;TZID=Europe/Istanbul:20261217T094000
-SUMMARY:Biological Effects of Ionian Radiation
+SUMMARY:Signal Transduction with Cell Surfaces Receptors I
 LOCATION:RG
-DESCRIPTION:Biophysics\, Devrim Sarıbal
+DESCRIPTION:Medical Biology\, Ayşe Nur Buyru
 END:VEVENT
 BEGIN:VEVENT
-UID:2cbe96f6f3b7577f@ctf-pratik
+UID:099116de5419dfde@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261217T095000
 DTEND;TZID=Europe/Istanbul:20261217T103000
-SUMMARY:Effects of Radiation at Cellular Level
+SUMMARY:Signal Transduction with Cell Surfaces Receptors II
 LOCATION:RG
-DESCRIPTION:Biophysics\, Devrim Sarıbal
+DESCRIPTION:Medical Biology\, Ayşe Nur Buyru
 END:VEVENT
 BEGIN:VEVENT
 UID:c3275780720f3713@ctf-pratik
@@ -1760,22 +1760,22 @@ LOCATION:RG
 DESCRIPTION:Biostatistics and Medical Informatics\, Osman M. Uğurel
 END:VEVENT
 BEGIN:VEVENT
-UID:f9e11200254c4d88@ctf-pratik
+UID:a0bbb4fd3b6ccb46@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261225T104000
 DTEND;TZID=Europe/Istanbul:20261225T112000
-SUMMARY:Signal Transduction with Cell Surfaces Receptors I
+SUMMARY:Biological Effects of Ionian Radiation
 LOCATION:RG
-DESCRIPTION:Medical Biology\, Ayşe Nur Buyru
+DESCRIPTION:Biophysics\, Devrim Sarıbal
 END:VEVENT
 BEGIN:VEVENT
-UID:1dfeb06dd0407844@ctf-pratik
+UID:5c9129b886abfe0f@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261225T113000
 DTEND;TZID=Europe/Istanbul:20261225T121000
-SUMMARY:Signal Transduction with Cell Surfaces Receptors II
+SUMMARY:Effects of Radiation at Cellular Level
 LOCATION:RG
-DESCRIPTION:Medical Biology\, Ayşe Nur Buyru
+DESCRIPTION:Biophysics\, Devrim Sarıbal
 END:VEVENT
 BEGIN:VEVENT
 UID:13b2adb5e8751799@ctf-pratik
