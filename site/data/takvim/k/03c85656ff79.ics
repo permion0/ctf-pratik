@@ -1643,13 +1643,13 @@ LOCATION:RG
 DESCRIPTION:Histology and Embriyology\, Gözde Erkanlı Şentürk
 END:VEVENT
 BEGIN:VEVENT
-UID:2e8a9b63aee8c89f@ctf-pratik
+UID:8b30bbae51c5cfb5@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261222T095000
 DTEND;TZID=Europe/Istanbul:20261222T103000
-SUMMARY:Mechanisms of Intercellular Signaling
+SUMMARY:Research designs: in silico and in vitro studies
 LOCATION:RG
-DESCRIPTION:Medical Biology\, Ayşe Nur Buyru
+DESCRIPTION:Medical Biology\, Onur Baykara
 END:VEVENT
 BEGIN:VEVENT
 UID:51aafa495c2ea76c@ctf-pratik
@@ -1670,22 +1670,22 @@ LOCATION:RG
 DESCRIPTION:Biophysics\, Devrim Sarıbal
 END:VEVENT
 BEGIN:VEVENT
-UID:c6d0b458d0824714@ctf-pratik
+UID:a3f3b0d427124cc0@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261223T090000
 DTEND;TZID=Europe/Istanbul:20261223T094000
-SUMMARY:Research designs: in silico and in vitro studies
-LOCATION:RG
-DESCRIPTION:Medical Biology\, Onur Baykara
-END:VEVENT
-BEGIN:VEVENT
-UID:49bbf1fa71b5126b@ctf-pratik
-DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261223T095000
-DTEND;TZID=Europe/Istanbul:20261223T103000
 SUMMARY:Randomisation and blinded studies in clinical trials
 LOCATION:RG
 DESCRIPTION:Pediatry\, Mehmet Yıldız
+END:VEVENT
+BEGIN:VEVENT
+UID:ae4770d5ca6ec7c8@ctf-pratik
+DTSTAMP:20260901T000000Z
+DTSTART;TZID=Europe/Istanbul:20261223T095000
+DTEND;TZID=Europe/Istanbul:20261223T103000
+SUMMARY:Mechanisms of Intercellular Signaling
+LOCATION:RG
+DESCRIPTION:Medical Biology\, Ayşe Nur Buyru
 END:VEVENT
 BEGIN:VEVENT
 UID:5bc1a25fade35eb4@ctf-pratik

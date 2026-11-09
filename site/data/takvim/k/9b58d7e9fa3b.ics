@@ -2289,22 +2289,22 @@ LOCATION:Çevrimiçi
 DESCRIPTION:Ortak Dersler Bölümü
 END:VEVENT
 BEGIN:VEVENT
-UID:ef7c61191c89ce21@ctf-pratik
+UID:a1d898edbf987d0d@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261223T090000
 DTEND;TZID=Europe/Istanbul:20261223T094000
-SUMMARY:Klinik araştırmalarda randomizasyon ve körleme
-LOCATION:EKU
-DESCRIPTION:Pediatri\, Mehmet Yıldız
-END:VEVENT
-BEGIN:VEVENT
-UID:7cf223a74cb4b1cd@ctf-pratik
-DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261223T095000
-DTEND;TZID=Europe/Istanbul:20261223T103000
 SUMMARY:Radyasyonun Hücre Düzeyindeki Etki Mekanizması
 LOCATION:EKU
 DESCRIPTION:Biyofizik\, Devrim Sarıbal
+END:VEVENT
+BEGIN:VEVENT
+UID:36ff868737ed522a@ctf-pratik
+DTSTAMP:20260901T000000Z
+DTSTART;TZID=Europe/Istanbul:20261223T095000
+DTEND;TZID=Europe/Istanbul:20261223T103000
+SUMMARY:Klinik araştırmalarda randomizasyon ve körleme
+LOCATION:EKU
+DESCRIPTION:Pediatri\, Mehmet Yıldız
 END:VEVENT
 BEGIN:VEVENT
 UID:5ef9fcbc4bf3448d@ctf-pratik
