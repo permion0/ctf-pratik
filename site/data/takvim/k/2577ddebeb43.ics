@@ -1643,13 +1643,13 @@ LOCATION:RG
 DESCRIPTION:Histology and Embriyology\, Gözde Erkanlı Şentürk
 END:VEVENT
 BEGIN:VEVENT
-UID:8b30bbae51c5cfb5@ctf-pratik
+UID:2e8a9b63aee8c89f@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261222T095000
 DTEND;TZID=Europe/Istanbul:20261222T103000
-SUMMARY:Research designs: in silico and in vitro studies
+SUMMARY:Mechanisms of Intercellular Signaling
 LOCATION:RG
-DESCRIPTION:Medical Biology\, Onur Baykara
+DESCRIPTION:Medical Biology\, Ayşe Nur Buyru
 END:VEVENT
 BEGIN:VEVENT
 UID:51aafa495c2ea76c@ctf-pratik
@@ -1670,13 +1670,13 @@ LOCATION:RG
 DESCRIPTION:Biophysics\, Devrim Sarıbal
 END:VEVENT
 BEGIN:VEVENT
-UID:8d6cce75387554ca@ctf-pratik
+UID:c6d0b458d0824714@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261223T090000
 DTEND;TZID=Europe/Istanbul:20261223T094000
-SUMMARY:Mechanisms of Intercellular Signaling
+SUMMARY:Research designs: in silico and in vitro studies
 LOCATION:RG
-DESCRIPTION:Medical Biology\, Ayşe Nur Buyru
+DESCRIPTION:Medical Biology\, Onur Baykara
 END:VEVENT
 BEGIN:VEVENT
 UID:49bbf1fa71b5126b@ctf-pratik
@@ -1688,22 +1688,22 @@ LOCATION:RG
 DESCRIPTION:Pediatry\, Mehmet Yıldız
 END:VEVENT
 BEGIN:VEVENT
-UID:b34aa820be1d33c2@ctf-pratik
+UID:5bc1a25fade35eb4@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261223T104000
 DTEND;TZID=Europe/Istanbul:20261223T112000
-SUMMARY:Description and Measurement of pH\, Activity of Hydrogen Ions
+SUMMARY:Immunobiology
 LOCATION:RG
-DESCRIPTION:Biophysics\, Nurten Bahtiyar
+DESCRIPTION:Medical Biology\, Ayşe Nur Buyru
 END:VEVENT
 BEGIN:VEVENT
-UID:406414e2ef8170de@ctf-pratik
+UID:b483e01c3fa261d3@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261223T113000
 DTEND;TZID=Europe/Istanbul:20261223T121000
-SUMMARY:Blood Gas Electrodes\, Blood Sample Drawing and Determination of AcidBase Equilibrium Parameters by Nomogram
+SUMMARY:Molecular Basis of Cell Differentiation
 LOCATION:RG
-DESCRIPTION:Biophysics\, Nurten Bahtiyar
+DESCRIPTION:Medical Biology\, Ayşe Nur Buyru
 END:VEVENT
 BEGIN:VEVENT
 UID:175683d782eceac3@ctf-pratik
@@ -1792,22 +1792,22 @@ DTEND;TZID=Europe/Istanbul:20261225T161500
 SUMMARY:SCIENTIFIC RESEARCH PANEL
 END:VEVENT
 BEGIN:VEVENT
-UID:c20521ecaa61b412@ctf-pratik
+UID:13b2adb5e8751799@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261228T090000
 DTEND;TZID=Europe/Istanbul:20261228T094000
-SUMMARY:Immunobiology
+SUMMARY:Description and Measurement of pH\, Activity of Hydrogen Ions
 LOCATION:RG
-DESCRIPTION:Medical Biology\, Ayşe Nur Buyru
+DESCRIPTION:Biophysics\, Nurten Bahtiyar
 END:VEVENT
 BEGIN:VEVENT
-UID:e007551fc1e9a764@ctf-pratik
+UID:ee5564c6c3cc2862@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261228T095000
 DTEND;TZID=Europe/Istanbul:20261228T103000
-SUMMARY:Molecular Basis of Cell Differentiation
+SUMMARY:Blood Gas Electrodes\, Blood Sample Drawing and Determination of AcidBase Equilibrium Parameters by Nomogram
 LOCATION:RG
-DESCRIPTION:Medical Biology\, Ayşe Nur Buyru
+DESCRIPTION:Biophysics\, Nurten Bahtiyar
 END:VEVENT
 BEGIN:VEVENT
 UID:53eaa1a9ea3ef1a2@ctf-pratik
