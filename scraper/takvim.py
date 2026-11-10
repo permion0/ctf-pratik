@@ -51,19 +51,19 @@ def kural_saati(veri, ders, kurul, grup, tarih):
     deger = next((g['degerler'].get(ders) for kk in (veri.get('pratik') or {}).get('kurullar', []) if kk['kurul'] == kurul
                   for g in kk['gunler'] if g['tarih'] == tarih), '') or ''
     if k.get('sira') == 'ab_donusumlu' and re.fullmatch(r'\d', deger):
+        # bütün kurullar birlikte: sıra kurul başında sıfırlanmaz, önceki kuruldan devam eder
+        iptaller = {d['tarih'] for d in veri.get('duzeltmeler') or [] if d['durum'] == 'iptal' and _kucuk(d['ders']) == _kucuk(ders)}
         yap = []
         for kk in (veri.get('pratik') or {}).get('kurullar', []):
-            if kk['kurul'] != kurul:
-                continue
             for g in kk['gunler']:
                 v = (g['degerler'].get(ders) or '').lower()
-                if not v.startswith(grup[0]) or g['tarih'] in k.get('iptal', []) or (g.get('olay') and ders in g['olay']['dersler']):
+                if not v.startswith(grup[0]) or g['tarih'] in k.get('iptal', []) or g['tarih'] in iptaller or (g.get('olay') and ders in g['olay']['dersler']):
                     continue
                 yap.append(g['tarih'])
         if tarih not in yap:
             return None
         i = sorted(yap).index(tarih)
-        ilk0 = (k.get('ilk_grup') or {}).get(f'{kurul}:{grup[0]}') or k.get('ilk')
+        ilk0 = k.get('ilk')
         if ilk0 == 'birlikte':
             once = 'birlikte' if i == 0 else ('b' if i % 2 else 'a')
         else:

@@ -1,5 +1,5 @@
 {
- "_aciklama": "Pratik saat/yer kuralları. Genel kural (varsayilan): grup her yapılan pratikte sıra değiştirir; ilk pratikte a önce girer (13:30), b sonra (14:30). Derse özel kayıt bunu ezer. Kaynak: 4A pratik grubu duyuruları (23 Eyl - 15 Eki 2026) ve üst dönem notu. Temsilci düzeltmesi ve bölüm listesi her zaman önce gelir.",
+ "_aciklama": "Pratik saat/yer kuralları. Genel kural (varsayilan): grup her yapılan pratikte sıra değiştirir; dersin ilk pratiğinde a önce girer (13:30), b sonra (14:30); sıra kurul başında sıfırlanmaz, önceki kuruldan devam eder. Derse özel kayıt bunu ezer. Kaynak: 4A pratik grubu duyuruları (23 Eyl - 15 Eki 2026) ve üst dönem notu. Temsilci düzeltmesi ve bölüm listesi her zaman önce gelir.",
  "dersler": {
   "Biyoistatistik": {
    "bas": "13:30",
@@ -28,10 +28,7 @@
     "2026-09-22",
     "2026-09-23",
     "2026-09-24"
-   ],
-   "ilk_grup": {
-    "1002:4": "b"
-   }
+   ]
   },
   "Anatomi": {
    "saatler": [

@@ -125,10 +125,10 @@ function pratikler(gun) {
     const k = kural(p.ders);
     if ((k.iptal || []).includes(gun)) { p.iptal = true; continue; }
     if (k.sira === 'ab_donusumlu' && p.kurul && /^\d$/.test(p.deger || '')) {
-      const sira = yapilanlar(p.ders, p.kurul, (p.grup || durum.grup)[0]).indexOf(gun);
+      const sira = yapilanlar(p.ders, (p.grup || durum.grup)[0]).indexOf(gun);
       if (sira >= 0) {
         const g = p.grup || durum.grup;
-        const once = siraKimde(k, sira, `${p.kurul}:${g[0]}`);
+        const once = siraKimde(k, sira);
         p.bas = once === 'birlikte' ? k.saatler[0] : k.saatler[g.slice(1) === once ? 0 : 1];
         p.bit = saatEkle(p.bas, k.sure || 60); p.bitTahmini = true;
         p.tahmini = true;
@@ -155,19 +155,18 @@ function pratikler(gun) {
   }
   return out;
 }
-/* k.ilk: ilk pratikte önce giren ('a') ya da 'birlikte'; sonra her pratikte sıra değişir */
-/* k.ilk_grup: {"1002:4": "b"} gibi, o kurulda o grubun ilk pratiğinde önce giren (bilinen istisna) */
-function siraKimde(k, sira, anahtar) {
-  const ilk0 = (k.ilk_grup || {})[anahtar] || k.ilk;
+/* k.ilk: dersin ilk pratiğinde önce giren ('a') ya da 'birlikte'; sonra her pratikte sıra değişir */
+function siraKimde(k, sira) {
+  const ilk0 = k.ilk;
   if (ilk0 === 'birlikte') return sira === 0 ? 'birlikte' : (sira % 2 === 1 ? 'b' : 'a');
   const ilk = ilk0 || 'a', diger = ilk === 'a' ? 'b' : 'a';
   return sira % 2 === 0 ? ilk : diger;
 }
-/* bir derste grubun gerçekten yapılan pratik günleri (iptal ve olay günleri hariç), sıralı */
-function yapilanlar(ders, kurul, rakam) {
+/* bir derste grubun gerçekten yapılan pratik günleri (iptal ve olay günleri hariç), sıralı.
+   Bütün kurullar birlikte: sıra kurul başında sıfırlanmaz, önceki kuruldan devam eder (temsilci, 10 Kasım). */
+function yapilanlar(ders, rakam) {
   const k = kural(ders), out = [];
   for (const kk of VERI.pratik?.kurullar || []) {
-    if (kk.kurul !== kurul) continue;
     for (const s of kk.gunler) {
       const v = (s.degerler[ders] || '').toLowerCase();
       if (v[0] !== rakam || (k.iptal || []).includes(s.tarih)) continue;
