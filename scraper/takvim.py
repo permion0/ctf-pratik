@@ -6,7 +6,8 @@
 import hashlib, os, re
 
 PRATIK_YER = {'Anatomi': 'Temel Bilimler B Blok, 2. kat', 'Biyofizik': 'Temel Bilimler B Blok, 2. kat',
-              'Biyokimya': 'Temel Bilimler B Blok, 1. kat', 'Biyoistatistik': 'Dahiliye binası, Hakkı Ogan amfisi'}
+              'Biyokimya': 'Temel Bilimler B Blok, 1. kat', 'Biyoistatistik': 'Dahiliye binası, Hakkı Ogan amfisi',
+              'Tıbbi Biyoloji': 'Temel Bilimler B Blok, 2. kat'}
 
 
 def _kac(s):
