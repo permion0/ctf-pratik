@@ -5418,11 +5418,11 @@ END:VEVENT
 BEGIN:VEVENT
 UID:b4130238c543f73f@ctf-pratik
 DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261110T143000
-DTEND;TZID=Europe/Istanbul:20261110T153000
+DTSTART;TZID=Europe/Istanbul:20261110T133000
+DTEND;TZID=Europe/Istanbul:20261110T143000
 SUMMARY:Biyokimya pratiği
 LOCATION:Temel Bilimler B Blok 1. kat\, pratik salonu
-DESCRIPTION:Grup 2b. Bu sefer önce 2a girer (tahmini)
+DESCRIPTION:Grup 2b. Bu sefer önce 2b girer (tahmini)
 END:VEVENT
 BEGIN:VEVENT
 UID:4b74020a93882230@ctf-pratik
@@ -5444,11 +5444,11 @@ END:VEVENT
 BEGIN:VEVENT
 UID:2e49278bdf7deca3@ctf-pratik
 DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261119T133000
-DTEND;TZID=Europe/Istanbul:20261119T143000
+DTSTART;TZID=Europe/Istanbul:20261119T143000
+DTEND;TZID=Europe/Istanbul:20261119T153000
 SUMMARY:Biyokimya pratiği
 LOCATION:Temel Bilimler B Blok 1. kat\, pratik salonu
-DESCRIPTION:Grup 2b. Bu sefer önce 2b girer (tahmini)
+DESCRIPTION:Grup 2b. Bu sefer önce 2a girer (tahmini)
 END:VEVENT
 BEGIN:VEVENT
 UID:e38c7c4ef449487f@ctf-pratik
@@ -5462,11 +5462,11 @@ END:VEVENT
 BEGIN:VEVENT
 UID:7e7c64e600aed3cc@ctf-pratik
 DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261130T143000
-DTEND;TZID=Europe/Istanbul:20261130T153000
+DTSTART;TZID=Europe/Istanbul:20261130T133000
+DTEND;TZID=Europe/Istanbul:20261130T143000
 SUMMARY:Biyokimya pratiği
 LOCATION:Temel Bilimler B Blok 1. kat\, pratik salonu
-DESCRIPTION:Grup 2b. Bu sefer önce 2a girer (tahmini)
+DESCRIPTION:Grup 2b. Bu sefer önce 2b girer (tahmini)
 END:VEVENT
 BEGIN:VEVENT
 UID:c189b7bda4ec5152@ctf-pratik
@@ -5488,11 +5488,11 @@ END:VEVENT
 BEGIN:VEVENT
 UID:736bbcbbe41d9e07@ctf-pratik
 DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261208T133000
-DTEND;TZID=Europe/Istanbul:20261208T143000
+DTSTART;TZID=Europe/Istanbul:20261208T143000
+DTEND;TZID=Europe/Istanbul:20261208T153000
 SUMMARY:Biyokimya pratiği
 LOCATION:Temel Bilimler B Blok 1. kat\, pratik salonu
-DESCRIPTION:Grup 2b. Bu sefer önce 2b girer (tahmini)
+DESCRIPTION:Grup 2b. Bu sefer önce 2a girer (tahmini)
 END:VEVENT
 BEGIN:VEVENT
 UID:e6fdc66000c60e1d@ctf-pratik
