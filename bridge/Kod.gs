@@ -39,9 +39,17 @@ function zamanlayiciKur() {
 }
 
 function veri() {
-  const out = { program: {}, duzeltmeler: [] };
+  const out = { program: {}, renk: {}, duzeltmeler: [] };
   SpreadsheetApp.openById(PROGRAM_ID).getSheets().forEach(function (s) {
-    if (SEKME.test(s.getName())) out.program[s.getName().trim()] = s.getDataRange().getDisplayValues();
+    if (!SEKME.test(s.getName())) return;
+    const r = s.getDataRange();
+    out.program[s.getName().trim()] = r.getDisplayValues();
+    // hücre arka plan renkleri (beyaz olmayanlar): { '#cfe2f3': ['satır:sütun', ...] }; panel dersleri mavi işaretli
+    const renk = {};
+    r.getBackgrounds().forEach(function (satir, i) {
+      satir.forEach(function (c, j) { if (c && c !== '#ffffff') (renk[c] = renk[c] || []).push(i + ':' + j); });
+    });
+    out.renk[s.getName().trim()] = renk;
   });
   const id = PROPS.getProperty('DUZELTME_ID');
   if (id) out.duzeltmeler = SpreadsheetApp.openById(id).getSheets()[0].getDataRange().getDisplayValues();

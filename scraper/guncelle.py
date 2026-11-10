@@ -148,7 +148,7 @@ def main():
     if kopru.get('program'):
         kaynak_durumu('drive_program', 'Ders programı (Drive)', durum.get('program_url', ''),
                       ozet(json.dumps(kopru['program'], sort_keys=True).encode()))
-        programlar = programcoz.oku(kopru['program'])
+        programlar = programcoz.oku(kopru['program'], kopru.get('renk'))
         # pratik tablosunda olup programda olmayan tatil/törenler (Yılbaşı, Tıp Bayramı gibi)
         for kod, pr in programlar.items():
             var = {o['tarih'] for o in pr.get('onemli', [])}

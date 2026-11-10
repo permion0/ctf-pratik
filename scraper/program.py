@@ -48,14 +48,15 @@ def tur(ders, abd):
     return 'teorik'
 
 
-def sekme(satirlar):
+def sekme(satirlar, renk=None):
+    hucre = {tuple(map(int, k.split(':'))): c for c, l in (renk or {}).items() for k in l}  # (satır, sütun) → arka plan
     gunler = {}      # tarih → [ders]
     kurullar = []    # [{kod, ad, bas}]
     gun_sutun = []   # [(tarih, sütun)]
     harita = {}      # gün başlangıç sütunu → {'ders': i, 'abd': i, 'hoca': i, 'yer': i} (başlık satırından)
     yapi = []        # biçim sorunları: varsa yayın durdurulur
     saat = None
-    for satir in satirlar:
+    for r, satir in enumerate(satirlar):
         satir = [c.strip() if isinstance(c, str) else '' for c in satir]
         ilk = satir[0] if satir else ''
         km = KURUL.search(ilk)
@@ -99,6 +100,9 @@ def sekme(satirlar):
             abd, hoca, yer = al('abd'), al('hoca'), al('yer')
             kayit = {'bas': saat[0], 'bit': saat[1], 'ders': re.sub(r'\s+', ' ', ders), 'abd': abd, 'hoca': hoca,
                      'yer': yer, 'tur': tur(ders, abd)}
+            rk = hucre.get((r, h.get('ders', s))) or hucre.get((r, s))
+            if rk:
+                kayit['renk'] = rk
             liste = gunler.setdefault(t, [])
             # birleşik pratik hücresi aynı saatte birkaç satır tekrar eder: bir kez yaz
             if not any(x['bas'] == kayit['bas'] and x['ders'] == kayit['ders'] for x in liste):
@@ -110,7 +114,7 @@ def sekme(satirlar):
     return {'gunler': gunler, 'kurullar': kurullar, 'yapi': sorted(set(yapi))[:10]}
 
 
-def oku(program):
+def oku(program, renk=None):
     out = {}
     for ad, satirlar in program.items():
         kod = PROGRAMLAR.get(ad.strip()) or PROGRAMLAR.get(re.sub(r'\s+', '', ad))
@@ -118,7 +122,7 @@ def oku(program):
             m = re.match(r'^\s*1\b.*?\b(TR|EN|MT)\b', ad, re.I)
             kod = m.group(1).upper() if m else None
         if kod:
-            out[kod] = sekme(satirlar)
+            out[kod] = sekme(satirlar, (renk or {}).get(ad))
             out[kod]['onemli'] = onemli_tarihler(satirlar)
     return out
 
