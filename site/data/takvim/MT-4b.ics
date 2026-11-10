@@ -5356,6 +5356,7 @@ DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261119T133000
 DTEND;TZID=Europe/Istanbul:20261119T143000
 SUMMARY:Tıbbi Biyoloji pratiği
+LOCATION:Temel Bilimler B Blok 2. kat\, Tıbbi Biyoloji uygulama salonu
 DESCRIPTION:Grup 4b. Tahmini saat
 END:VEVENT
 BEGIN:VEVENT
@@ -5400,6 +5401,7 @@ DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261203T133000
 DTEND;TZID=Europe/Istanbul:20261203T143000
 SUMMARY:Tıbbi Biyoloji pratiği
+LOCATION:Temel Bilimler B Blok 2. kat\, Tıbbi Biyoloji uygulama salonu
 DESCRIPTION:Grup 4b. Tahmini saat
 END:VEVENT
 BEGIN:VEVENT
@@ -5426,6 +5428,7 @@ DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261216T133000
 DTEND;TZID=Europe/Istanbul:20261216T143000
 SUMMARY:Tıbbi Biyoloji pratiği
+LOCATION:Temel Bilimler B Blok 2. kat\, Tıbbi Biyoloji uygulama salonu
 DESCRIPTION:Grup 4b. Tahmini saat
 END:VEVENT
 BEGIN:VEVENT
@@ -5443,6 +5446,7 @@ DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261223T133000
 DTEND;TZID=Europe/Istanbul:20261223T143000
 SUMMARY:Tıbbi Biyoloji pratiği
+LOCATION:Temel Bilimler B Blok 2. kat\, Tıbbi Biyoloji uygulama salonu
 DESCRIPTION:Grup 4b. Tahmini saat
 END:VEVENT
 BEGIN:VEVENT
