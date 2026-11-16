@@ -130,6 +130,9 @@ def grup_olaylari(veri, program, grup, damga, kesinler=None, bolum=None):
                 if v in ('', '-') or not (v == grup or v == grup[0]):
                     continue
                 kesin = (kesinler or {}).get((g['tarih'], ders))
+                # kişisel takvim: bu kurulda bu dersin listesi varsa ve bu gün listede yoksa tablo satırını atla
+                if not kesin and any(isinstance(o, dict) and o.get('ders') == ders and o.get('kurul') == k['kurul'] for o in (kesinler or {}).values()):
+                    continue
                 dg = (kesinler or {}).get(('grup', ders)) or grup
                 slot = next((x for x in gunler.get(g['tarih'], []) if x['tur'] == 'pratik'), None)
                 kural = kural_saati(veri, ders, k['kurul'], dg, g['tarih'])
@@ -143,7 +146,7 @@ def grup_olaylari(veri, program, grup, damga, kesinler=None, bolum=None):
                         continue
                     kural = (min(o['bas'] for o in bugunku), max(o['bit'] for o in bugunku), 'Alt grubuna göre yarım saat; kesin saatin için siteye bak')
                 if kesin and kesin.get('bas'):
-                    bas, bit, aciklama = kesin['bas'], kesin['bit'], f'Alt grup {kesin["grup"]}-{kesin["alt"]}'
+                    bas, bit, aciklama = kesin['bas'], kesin['bit'], f'Alt grup {kesin["grup"]}{"-" if str(kesin["alt"]).isdigit() else ""}{kesin["alt"]}' + (f', {kesin["deney"]}' if kesin.get('deney') else '')
                 elif kural:
                     bas, bit, aciklama = kural[0], kural[1], f'Grup {dg}. {kural[2]}'
                 else:
@@ -217,12 +220,12 @@ def yaz(veri, liste, data_klasoru, damga):
     # kişisel: listedeki numaralar için kesin saatli takvim (programı TR/EN numaradan bilinmez; ikisini de üret)
     for h, idx in liste.get('numara', {}).items():
         oturumlar = [liste['oturumlar'][i] for i in idx]
-        grup = oturumlar[0]['grup']
+        grup = next((o['grup'] for o in oturumlar if re.fullmatch(r'\d[ab]', o['grup'])), oturumlar[0]['grup'])
         program = 'EN' if grup.startswith('1') else 'TR'
         kesinler = {(o['tarih'], o['ders']): o for o in oturumlar}
         olaylar = grup_olaylari(veri, program, grup, damga, kesinler)
         # tabloda olmayan ama listede olan oturumlar
         for o in oturumlar:
             if not any(f'{o["ders"]} pratiği' in s for s in olaylar) and o.get('bas'):
-                olaylar += _olay(_uid(h, o['tarih'], o['ders']), o['tarih'], o['bas'], o['bit'], f'{o["ders"]} pratiği', PRATIK_YER.get(o['ders'], ''), f'Alt grup {o["grup"]}-{o["alt"]}', damga)
+                olaylar += _olay(_uid(h, o['tarih'], o['ders']), o['tarih'], o['bas'], o['bit'], f'{o["ders"]} pratiği', PRATIK_YER.get(o['ders'], ''), f'Alt grup {o["grup"]}{"-" if str(o["alt"]).isdigit() else ""}{o["alt"]}' + (f', {o["deney"]}' if o.get('deney') else ''), damga)
         open(os.path.join(hedef, 'k', f'{h}.ics'), 'w', encoding='utf-8').write(_takvim(f'CTF 1. sınıf · pratiklerim ({grup})', olaylar))

@@ -6,11 +6,16 @@ Excel'in kendisi depoya girmez (manual/ham/ git dışında).
 """
 import json, os, sys
 sys.path.insert(0, os.path.dirname(__file__))
-import liste_xlsx
+import liste_xlsx, liste_deney
 from guncelle import numara_ozeti, KAYNAK
 
 yol, kurul, ders = sys.argv[1:4]
-oturumlar = liste_xlsx.oku(yol, ders, kurul)
+if liste_deney.uygun(yol):  # biçim 2: alt gruplar A-D + DENEY | TARİH | SAAT tablosu
+    oturumlar, uyari = liste_deney.oku(yol, ders, kurul)
+    for u in uyari:
+        print('uyarı:', u)
+else:
+    oturumlar = liste_xlsx.oku(yol, ders, kurul)
 for o in oturumlar:
     o['numaralar'] = sorted(numara_ozeti(n) for n in o['numaralar'])
 hedef = os.path.join(KAYNAK, 'listeler', f'{kurul}_{ders}.json')

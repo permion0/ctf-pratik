@@ -78,7 +78,7 @@ async function benimOturumlar() {
   durum.istisna = {}; durum.listeGrubu = {};
   for (const l of LISTE.istisna || []) if (l.gruplar[h]) durum.istisna[`${l.kurul}|${l.ders}`] = durum.listeGrubu[`${l.kurul}|${l.ders}`] = l.gruplar[h];
   const benim = (LISTE.numara[h] || []).map(i => LISTE.oturumlar[i]);
-  for (const o of benim) durum.listeGrubu[`${o.kurul}|${o.ders}`] ??= o.grup;
+  for (const o of benim) if (/^\d[ab]$/.test(o.grup)) durum.listeGrubu[`${o.kurul}|${o.ders}`] ??= o.grup;  // A-D alt grupları (biçim 2) a/b grubunu belirlemez
   return benim;
 }
 /* o kurulun listesi; yoksa aynı dersin önceki kuruldaki listesi (bölümler grupları kurul kurul değiştirmiyor); yoksa numara aralığı */
@@ -112,7 +112,7 @@ function pratikler(gun) {
     if (o.tarih !== gun) continue;
     let p = out.find(x => x.ders === o.ders);
     if (!p) { p = { ders: o.ders, kurul: o.kurul, kaynak: 'Bölüm listesi' }; out.push(p); }
-    Object.assign(p, { bas: o.bas, bit: o.bit, altgrup: `${o.grup}-${o.alt}`, saatKaynak: `${o.ders} bölümünün listesi` });
+    Object.assign(p, { bas: o.bas, bit: o.bit, altgrup: /^\d+$/.test(String(o.alt)) ? `${o.grup}-${o.alt}` : `${o.grup}${o.alt}`, deney: o.deney || '', saatKaynak: `${o.ders} bölümünün listesi` });
   }
   // bölüm listesi o derste başka bir günü gösteriyorsa tablo satırını düşür
   for (let i = out.length - 1; i >= 0; i--) {
@@ -138,6 +138,7 @@ function pratikler(gun) {
     } else if (k.bas || k.saatler) { p.bas = k.bas || k.saatler[0]; p.bit = saatEkle(p.bas, k.sure || 60); p.bitTahmini = true; p.tahmini = !(k.dogrulanan || []).includes(gun); }
   }
   for (const p of out) { const tn = kural(p.ders).tarih_notlari?.[gun]; if (tn) p.tarihNotu = tn; }
+  for (const p of out) { const kn = p.kurul && kural(p.ders).kurul_notlari?.[p.kurul]; if (kn) p.kurulNotu = kn; }
   // temsilci düzeltmeleri
   for (const d of VERI.duzeltmeler || []) {
     if (d.tarih !== gun || (d.tur && d.tur !== 'pratik')) continue;
@@ -243,7 +244,7 @@ function durakPratik(p, gun) {
     <div class="icerik"><div class="ders">${esc(p.ders)} pratiği${p.iptal ? ' (iptal)' : ''}</div>
     ${yer ? `<div class="alt">${esc(yer)}</div>` : ''}${p.not ? `<div class="alt">${esc(p.not)}</div>` : ''}
     <div class="etiketler">${etiket}</div>
-    ${(() => { const n = [p.istisna ? `${p.ders} listesinde ${p.grup} grubundasın.` : '', p.siraNotu ? p.siraNotu + '.' : (k.not && !p.altgrup ? k.not + '.' : ''), p.tarihNotu ? p.tarihNotu + '.' : ''].filter(Boolean).join(' '); return n ? `<div class="alt" style="margin-top:8px">${esc(n)}</div>` : ''; })()}
+    ${(() => { const n = [p.istisna ? `${p.ders} listesinde ${p.grup} grubundasın.` : '', p.siraNotu ? p.siraNotu + '.' : (k.not && !p.altgrup ? k.not + '.' : ''), p.tarihNotu ? p.tarihNotu + '.' : '', p.deney ? p.deney[0].toUpperCase() + p.deney.slice(1) + '.' : '', p.kurulNotu || ''].filter(Boolean).join(' '); return n ? `<div class="alt" style="margin-top:8px">${esc(n)}</div>` : ''; })()}
     </div></div></li>` };
 }
 

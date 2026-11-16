@@ -28,7 +28,10 @@
     "2026-09-22",
     "2026-09-23",
     "2026-09-24"
-   ]
+   ],
+   "kurul_notlari": {
+    "1002": "Sözlü bu kurulda yalnız Biyokimya pratiklerinde: 4 pratiğin en az 2'sinde sözlü yapılır, puan sözlülerin ortalaması (vizenin 8 puanı sözlüden, 92'si yazılıdan). Gelmediğin her pratik sözlü puanının %25'ini götürür."
+   }
   },
   "Anatomi": {
    "saatler": [
