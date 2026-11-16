@@ -5353,15 +5353,6 @@ LOCATION:Temel Bilimler B Blok 1. kat\, pratik salonu
 DESCRIPTION:Grup 4b. Bu sefer önce 4a girer (tahmini)
 END:VEVENT
 BEGIN:VEVENT
-UID:6d48e3c8bade6cc6@ctf-pratik
-DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261005T133000
-DTEND;TZID=Europe/Istanbul:20261005T161500
-SUMMARY:Biyofizik pratiği
-LOCATION:Temel Bilimler B Blok 2. kat
-DESCRIPTION:Grup 4b. Alt grup ve saat\, bölüm listesi yayınlanınca belli olur
-END:VEVENT
-BEGIN:VEVENT
 UID:c634516cf4a81d05@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261006T130000
@@ -5434,15 +5425,6 @@ LOCATION:Temel Bilimler B Blok 2. kat\, Tıbbi Biyoloji uygulama salonu
 DESCRIPTION:Grup 4b. Tahmini saat
 END:VEVENT
 BEGIN:VEVENT
-UID:df0641a667d6d353@ctf-pratik
-DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261123T133000
-DTEND;TZID=Europe/Istanbul:20261123T161500
-SUMMARY:Biyofizik pratiği
-LOCATION:Temel Bilimler B Blok 2. kat
-DESCRIPTION:Grup 4b. Alt grup ve saat\, bölüm listesi yayınlanınca belli olur
-END:VEVENT
-BEGIN:VEVENT
 UID:ecd0f8abdd87aa70@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261124T143000
@@ -5455,10 +5437,10 @@ BEGIN:VEVENT
 UID:d34cd877a87a773b@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261201T133000
-DTEND;TZID=Europe/Istanbul:20261201T161500
+DTEND;TZID=Europe/Istanbul:20261201T143000
 SUMMARY:Biyofizik pratiği
 LOCATION:Temel Bilimler B Blok 2. kat
-DESCRIPTION:Grup 4b. Alt grup ve saat\, bölüm listesi yayınlanınca belli olur
+DESCRIPTION:Alt grup 4D\, 1. deney (H1)
 END:VEVENT
 BEGIN:VEVENT
 UID:ed2e0d5494a6772e@ctf-pratik
@@ -5488,15 +5470,6 @@ LOCATION:Temel Bilimler B Blok 1. kat\, pratik salonu
 DESCRIPTION:Grup 4b. Bu sefer önce 4a girer (tahmini)
 END:VEVENT
 BEGIN:VEVENT
-UID:c81706a7ec2e20ea@ctf-pratik
-DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261215T133000
-DTEND;TZID=Europe/Istanbul:20261215T161500
-SUMMARY:Biyofizik pratiği
-LOCATION:Temel Bilimler B Blok 2. kat
-DESCRIPTION:Grup 4b. Alt grup ve saat\, bölüm listesi yayınlanınca belli olur
-END:VEVENT
-BEGIN:VEVENT
 UID:725450654228e624@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261216T133000
@@ -5509,10 +5482,10 @@ BEGIN:VEVENT
 UID:d0eab2b6d8f61128@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261222T133000
-DTEND;TZID=Europe/Istanbul:20261222T161500
+DTEND;TZID=Europe/Istanbul:20261222T143000
 SUMMARY:Biyofizik pratiği
 LOCATION:Temel Bilimler B Blok 2. kat
-DESCRIPTION:Grup 4b. Alt grup ve saat\, bölüm listesi yayınlanınca belli olur
+DESCRIPTION:Alt grup 4D\, 2. deney (H2)
 END:VEVENT
 BEGIN:VEVENT
 UID:14fae07e2de2d5bc@ctf-pratik
@@ -5526,11 +5499,11 @@ END:VEVENT
 BEGIN:VEVENT
 UID:2da065f0f1f50552@ctf-pratik
 DTSTAMP:20260901T000000Z
-DTSTART;TZID=Europe/Istanbul:20261231T133000
-DTEND;TZID=Europe/Istanbul:20261231T161500
+DTSTART;TZID=Europe/Istanbul:20261231T153000
+DTEND;TZID=Europe/Istanbul:20261231T163000
 SUMMARY:Biyofizik pratiği
 LOCATION:Temel Bilimler B Blok 2. kat
-DESCRIPTION:Grup 4b. Alt grup ve saat\, bölüm listesi yayınlanınca belli olur
+DESCRIPTION:Alt grup 4D\, 3. deney (O1)
 END:VEVENT
 BEGIN:VEVENT
 UID:8c1323478fb29c2a@ctf-pratik
