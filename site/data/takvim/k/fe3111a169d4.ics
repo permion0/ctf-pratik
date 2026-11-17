@@ -1523,13 +1523,13 @@ LOCATION:EKU
 DESCRIPTION:Tıbbi Biyokimya\, Karolin Yanar
 END:VEVENT
 BEGIN:VEVENT
-UID:b5adee48dee6dae5@ctf-pratik
+UID:8c67a7d40a8b7660@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261119T113000
 DTEND;TZID=Europe/Istanbul:20261119T121000
-SUMMARY:Golgi Kompleksi\; Yapısı ve Proteinlerin Ayrımlanma Mekanizmaları
+SUMMARY:Endoplazmik Retikulumda Gerçekleşen Protein Sentezinin Moleküler Temeli
 LOCATION:EKU
-DESCRIPTION:Tıbbi Biyoloji\, Fatma Kaya Dağıstanlı
+DESCRIPTION:Tıbbi Biyoloji\, Ahmet Özaydın
 END:VEVENT
 BEGIN:VEVENT
 UID:5c3d71acd7ccc3d4@ctf-pratik
@@ -1559,13 +1559,13 @@ LOCATION:Çevrimiçi
 DESCRIPTION:Ortak Dersler Bölümü
 END:VEVENT
 BEGIN:VEVENT
-UID:fe45b4b0df22b22e@ctf-pratik
+UID:e33ab1ae95ede480@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261123T090000
 DTEND;TZID=Europe/Istanbul:20261123T094000
-SUMMARY:Endoplazmik Retikulumda Gerçekleşen Protein Sentezinin Moleküler Temeli
+SUMMARY:Golgi Kompleksi\; Yapısı ve Proteinlerin Ayrımlanma Mekanizmaları
 LOCATION:EKU
-DESCRIPTION:Tıbbi Biyoloji\, Ahmet Özaydın
+DESCRIPTION:Tıbbi Biyoloji\, Fatma Kaya Dağıstanlı
 END:VEVENT
 BEGIN:VEVENT
 UID:ebbe10f205568fe9@ctf-pratik
