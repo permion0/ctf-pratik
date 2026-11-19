@@ -1134,20 +1134,20 @@ LOCATION:RG
 DESCRIPTION:Medical Biology\, Onur Baykara
 END:VEVENT
 BEGIN:VEVENT
-UID:bb65982584835854@ctf-pratik
+UID:ad8ac9c8520efa72@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261123T104000
 DTEND;TZID=Europe/Istanbul:20261123T112000
-SUMMARY:Cell Junctions I: Tight Juctions
+SUMMARY:Structure and Functions of Cell Nucleus and Nucleolus
 LOCATION:RG
 DESCRIPTION:Medical Biology\, Onur Baykara
 END:VEVENT
 BEGIN:VEVENT
-UID:d38645701a38ee70@ctf-pratik
+UID:c9a7512cde8803b4@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261123T113000
 DTEND;TZID=Europe/Istanbul:20261123T121000
-SUMMARY:Cell Junctions II: Adherens Connections and Gap Connection Organisation
+SUMMARY:Transport Between Nucleus and Cytoplasm
 LOCATION:RG
 DESCRIPTION:Medical Biology\, Onur Baykara
 END:VEVENT
@@ -1526,22 +1526,22 @@ LOCATION:RG
 DESCRIPTION:Medical Biology\, Ayşe Nur Buyru
 END:VEVENT
 BEGIN:VEVENT
-UID:9ec9aab10897eed0@ctf-pratik
+UID:da9bf68c669326cc@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261216T090000
 DTEND;TZID=Europe/Istanbul:20261216T094000
-SUMMARY:Formulating research questions and hypotheses\; methods of literature review (PubMed\, Scopus\, Web of Science)
+SUMMARY:Research designs: animal and ex vivo studies
 LOCATION:RG
-DESCRIPTION:Medical Education\, Özlem Serpil Çakmakkaya
+DESCRIPTION:Histology and Embriyology\, Gözde Erkanlı Şentürk
 END:VEVENT
 BEGIN:VEVENT
-UID:2b847b78688e9d18@ctf-pratik
+UID:0ac1eb0d168799d5@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261216T095000
 DTEND;TZID=Europe/Istanbul:20261216T103000
-SUMMARY:Evaluation of sources and systematic review
+SUMMARY:Research designs: in silico and in vitro studies
 LOCATION:RG
-DESCRIPTION:Medical Education\, Özlem Serpil Çakmakkaya
+DESCRIPTION:Medical Biology\, Onur Baykara
 END:VEVENT
 BEGIN:VEVENT
 UID:2f6b4bdfcd6fa20b@ctf-pratik
@@ -1634,22 +1634,22 @@ LOCATION:RG
 DESCRIPTION:Medical Biochemistry\, Yıldız Dinçer
 END:VEVENT
 BEGIN:VEVENT
-UID:cb82432a411ac4e0@ctf-pratik
+UID:b0dad482551fbe42@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261222T090000
 DTEND;TZID=Europe/Istanbul:20261222T094000
-SUMMARY:Research designs: animal and ex vivo studies
+SUMMARY:Formulating research questions and hypotheses\; methods of literature review (PubMed\, Scopus\, Web of Science)
 LOCATION:RG
-DESCRIPTION:Histology and Embriyology\, Gözde Erkanlı Şentürk
+DESCRIPTION:Medical Education\, Özlem Serpil Çakmakkaya
 END:VEVENT
 BEGIN:VEVENT
-UID:8b30bbae51c5cfb5@ctf-pratik
+UID:b06a5a3b0fd29410@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261222T095000
 DTEND;TZID=Europe/Istanbul:20261222T103000
-SUMMARY:Research designs: in silico and in vitro studies
+SUMMARY:Evaluation of sources and systematic review
 LOCATION:RG
-DESCRIPTION:Medical Biology\, Onur Baykara
+DESCRIPTION:Medical Education\, Özlem Serpil Çakmakkaya
 END:VEVENT
 BEGIN:VEVENT
 UID:51aafa495c2ea76c@ctf-pratik
@@ -1814,20 +1814,20 @@ LOCATION:RG
 DESCRIPTION:History of Medicine and Ethics\, Ahmet Özdinç
 END:VEVENT
 BEGIN:VEVENT
-UID:bd1205fb8c67fe7c@ctf-pratik
+UID:91fc1ca05ecf4a47@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261229T090000
 DTEND;TZID=Europe/Istanbul:20261229T094000
-SUMMARY:Structure and Functions of Cell Nucleus and Nucleolus
+SUMMARY:Cell Junctions I: Tight Juctions
 LOCATION:RG
 DESCRIPTION:Medical Biology\, Onur Baykara
 END:VEVENT
 BEGIN:VEVENT
-UID:d8ffff96450d2965@ctf-pratik
+UID:077742b61b78c3d2@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261229T095000
 DTEND;TZID=Europe/Istanbul:20261229T103000
-SUMMARY:Transport Between Nucleus and Cytoplasm
+SUMMARY:Cell Junctions II: Adherens Connections and Gap Connection Organisation
 LOCATION:RG
 DESCRIPTION:Medical Biology\, Onur Baykara
 END:VEVENT
