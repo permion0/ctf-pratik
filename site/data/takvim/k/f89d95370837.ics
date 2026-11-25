@@ -1765,20 +1765,20 @@ LOCATION:EKU
 DESCRIPTION:Tıbbi Biyoloji\, Halide Sema Bolkent
 END:VEVENT
 BEGIN:VEVENT
-UID:73ce046a927fc39b@ctf-pratik
+UID:684d5e8be2178cf9@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261130T104000
 DTEND;TZID=Europe/Istanbul:20261130T112000
-SUMMARY:Hücre Membran Yüzey Farklılaşmaları: Mikrovillus\, Silya\, Flagella
+SUMMARY:Enzimler: Genel Özellikler
 LOCATION:EKU
-DESCRIPTION:Tıbbi Biyoloji\, Fatma Dağıstanlı
+DESCRIPTION:Tıbbi Biyokimya\, Özlem Balcı Ekmekçi
 END:VEVENT
 BEGIN:VEVENT
-UID:7c8595bf35d82317@ctf-pratik
+UID:04f87a05d306bc00@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261130T113000
 DTEND;TZID=Europe/Istanbul:20261130T121000
-SUMMARY:Enzimler: Genel Özellikler
+SUMMARY:Enzim İnhibisyonu
 LOCATION:EKU
 DESCRIPTION:Tıbbi Biyokimya\, Özlem Balcı Ekmekçi
 END:VEVENT
@@ -1837,13 +1837,13 @@ LOCATION:EKU
 DESCRIPTION:Biyofizik\, Semra Özdemir
 END:VEVENT
 BEGIN:VEVENT
-UID:769d74b63cb92411@ctf-pratik
+UID:ad5c49edbf0d4f82@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261202T095000
 DTEND;TZID=Europe/Istanbul:20261202T103000
-SUMMARY:Enzim İnhibisyonu
+SUMMARY:Hücre Membran Yüzey Farklılaşmaları: Mikrovillus\, Silya\, Flagella
 LOCATION:EKU
-DESCRIPTION:Tıbbi Biyokimya\, Özlem Balcı Ekmekçi
+DESCRIPTION:Tıbbi Biyoloji\, Fatma Dağıstanlı
 END:VEVENT
 BEGIN:VEVENT
 UID:8d9d3bdb7ece7727@ctf-pratik
