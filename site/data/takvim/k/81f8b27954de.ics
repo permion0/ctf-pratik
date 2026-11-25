@@ -1756,11 +1756,11 @@ LOCATION:EKU
 DESCRIPTION:Tıbbi Biyoloji\, Halide Sema Bolkent
 END:VEVENT
 BEGIN:VEVENT
-UID:7cadbde0f76ead3d@ctf-pratik
+UID:a8713319cefbc7b9@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261130T095000
 DTEND;TZID=Europe/Istanbul:20261130T103000
-SUMMARY:Peroksizom\, Sentriol
+SUMMARY:Hücre-Hücre ve Hücre-Matriks Bağlantıları: Tutucu Bağlantılar
 LOCATION:EKU
 DESCRIPTION:Tıbbi Biyoloji\, Halide Sema Bolkent
 END:VEVENT
@@ -1846,11 +1846,11 @@ LOCATION:EKU
 DESCRIPTION:Tıbbi Biyokimya\, Özlem Balcı Ekmekçi
 END:VEVENT
 BEGIN:VEVENT
-UID:5258d3582d50158e@ctf-pratik
+UID:8d9d3bdb7ece7727@ctf-pratik
 DTSTAMP:20260901T000000Z
 DTSTART;TZID=Europe/Istanbul:20261202T104000
 DTEND;TZID=Europe/Istanbul:20261202T112000
-SUMMARY:Hücre-Hücre ve Hücre-Matriks Bağlantıları: Tutucu Bağlantılar
+SUMMARY:Peroksizom\, Sentriol
 LOCATION:EKU
 DESCRIPTION:Tıbbi Biyoloji\, Halide Sema Bolkent
 END:VEVENT
